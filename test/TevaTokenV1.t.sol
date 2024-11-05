@@ -37,7 +37,7 @@ contract TevaTokenV1Test is Test {
     uint256 public constant MAX_CAP = 4_000_000_000 * 10 ** 18; // 4 billion tokens with 18 decimals
 
     /// @notice Type hash used when encoding data for `delegateOnBehalf` calls.
-    bytes32 public constant DELEGATION_TYPEHASH =
+    bytes32 public constant DELEGATION_HASH =
         keccak256(
             "Delegation(address owner,address delegatee,uint256 nonce,uint256 expiry)"
         );
@@ -255,7 +255,7 @@ contract TevaTokenV1Test is Test {
 
         bytes32 _message = keccak256(
             abi.encode(
-                DELEGATION_TYPEHASH,
+                DELEGATION_HASH,
                 _signer,
                 _delegatee,
                 token.nonces(_signer),
@@ -307,7 +307,7 @@ contract TevaTokenV1Test is Test {
 
         bytes32 _message = keccak256(
             abi.encode(
-                DELEGATION_TYPEHASH,
+                DELEGATION_HASH,
                 _signer,
                 _delegatee,
                 token.nonces(_signer),
@@ -350,7 +350,7 @@ contract TevaTokenV1Test is Test {
         uint256 expiry = block.timestamp + 1 days;
         bytes32 delegateHash = keccak256(
             abi.encode(
-                token.DELEGATION_TYPEHASH(),
+                token.DELEGATION_HASH(),
                 USER,
                 delegatee,
                 token.nonces(USER),

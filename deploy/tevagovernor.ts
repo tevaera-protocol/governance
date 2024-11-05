@@ -13,8 +13,8 @@ const TransparentUpgradeableProxy = require("../artifacts-zk/contracts/proxy/Tra
 //  and TEVA_QUORUM_PERCENTAGE with actual values as per the project requirements.
 const TEVA_TOKEN_CONTRACT_ADDRESS = process.env.TEVA_TOKEN_CONTRACT_ADDRESS; // Teva Token Contract Address
 const TEVA_TIMELOCK_CONTRACT_ADDRESS = process.env.TEVA_TIMELOCK_CONTRACT_ADDRESS;  // Teva Time lockController Address
-const TEVA_VOTING_DELAY = 5n;   // Number of blocks in between
-const TEVA_VOTING_PERIOD = 10n;  // Numbers of blocks in between when voting remains valid  
+const TEVA_VOTING_DELAY = 300n;   // Number of blocks in between
+const TEVA_VOTING_PERIOD = 604800n;  // Numbers of blocks in between when voting remains valid  
 const TEVA_PROPOSAL_THRESHOLD = ethers.parseUnits("1000", 18); // Token value :1000
 const TEVA_QUORUM_PERCENTAGE = 4n; // quorum percentage
 
@@ -78,52 +78,46 @@ export default async function (hre: HardhatRuntimeEnvironment) {
   console.log("Verification res: ", verifyTevaGovernor);
 
   // Deploy the transparent proxy
-  // const transparentProxyConstArgs = [
-  //   await TevaGovernorContract.getAddress(),
-  //   proxyAdminContractAddress,
-  //   "0x",
-  // ];
-  // const transparentUpgradeableProxyFactory = new ContractFactory(
-  //   TransparentUpgradeableProxy.abi,
-  //   TransparentUpgradeableProxy.bytecode,
-  //   proxyAdminWallet
-  // );
-  // const transparentProxyContract =
-  //   await transparentUpgradeableProxyFactory.deploy(
-  //     await TevaGovernorContract.getAddress(),
-  //     proxyAdminContractAddress,
-  //     "0x"
-  //   );
-  // await transparentProxyContract.waitForDeployment();
-  // console.log(
-  //   "transparentUpgradeableProxy deployed at:",
-  //   await transparentProxyContract.getAddress()
-  // );
+  const transparentProxyConstArgs = [
+    await TevaGovernorContract.getAddress(),
+    proxyAdminContractAddress,
+    "0x",
+  ];
+  const transparentUpgradeableProxyFactory = new ContractFactory(
+    TransparentUpgradeableProxy.abi,
+    TransparentUpgradeableProxy.bytecode,
+    proxyAdminWallet
+  );
+  const transparentProxyContract =
+    await transparentUpgradeableProxyFactory.deploy(
+      await TevaGovernorContract.getAddress(),
+      proxyAdminContractAddress,
+      "0x"
+    );
+  await transparentProxyContract.waitForDeployment();
+  console.log(
+    "transparentUpgradeableProxy deployed at:",
+    await transparentProxyContract.getAddress()
+  );
 
-  // const verifyProxy = await hre.run("verify:verify", {
-  //   address: await transparentProxyContract.getAddress(),
-  //   constructorArguments: transparentProxyConstArgs,
-  // });
+  const verifyProxy = await hre.run("verify:verify", {
+    address: await transparentProxyContract.getAddress(),
+    constructorArguments: transparentProxyConstArgs,
+  });
 
-  // console.log("Verification res: ", verifyProxy);
+  console.log("Verification res: ", verifyProxy);
 
   // Initializing TevaGovernor contract through proxy
   const NY_JSON = require("../artifacts-zk/contracts/TevaGovernorV1.sol/TevaGovernorV1.json");
   const NY_ABI = NY_JSON.abi;
-  
-  // const nyContract = new Contract(
-  //   await transparentProxyContract.getAddress(),
-  //   NY_ABI,
-  //   contractAdminWallet._signerL2()
-  // );
 
   const nyContract = new Contract(
-    "0x71b51C169916f4648f0D164ED93c95B8A1e578B2",
+    await transparentProxyContract.getAddress(),
     NY_ABI,
     contractAdminWallet._signerL2()
   );
   
-  const initializeTevaGovernorTx = await nyContract.initializeV2();
+  const initializeTevaGovernorTx = await nyContract.initialize(TEVA_TOKEN_CONTRACT_ADDRESS, TEVA_TIMELOCK_CONTRACT_ADDRESS, TEVA_VOTING_DELAY, TEVA_VOTING_PERIOD, TEVA_PROPOSAL_THRESHOLD, TEVA_QUORUM_PERCENTAGE);
   await initializeTevaGovernorTx.wait();
   console.log("TevaGovernor initialization response: ", initializeTevaGovernorTx);
 }
