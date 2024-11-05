@@ -2,10 +2,14 @@
 pragma solidity ^0.8.26;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
 import "./VestingWalletCliffUpgradeable.sol";
 import "./token/TevaTokenV1.sol";
 
-contract MultiVestingWalletCliffV1 is OwnableUpgradeable {
+contract MultiVestingWalletCliffV1 is
+    OwnableUpgradeable,
+    ReentrancyGuardUpgradeable
+{
     TevaTokenV1 public tevaToken;
     
     /// @dev Mapping to track vesting wallets for each beneficiary. 
@@ -36,10 +40,12 @@ contract MultiVestingWalletCliffV1 is OwnableUpgradeable {
         uint256 amount
     );
 
-    /// @dev Initializes the contract, setting the owner and linking the `TevaToken` contract.
-    /// @param _tevaToken The address of the TevaToken contract.
+    /// @dev Zero Address
+    error ZeroAddress();
+
     function initialize(address _tevaToken) external initializer {
         __Ownable_init(msg.sender);
+        __ReentrancyGuard_init(); 
         tevaToken = TevaTokenV1(_tevaToken);
     }
 
@@ -57,14 +63,20 @@ contract MultiVestingWalletCliffV1 is OwnableUpgradeable {
         uint64 duration,
         uint64 cliff,
         uint256 amount
-    ) external onlyOwner {
-        // Ensure that a vesting wallet does not already exist for the beneficiary.
+    ) external onlyOwner nonReentrant {
+        // Revert for Zero Address
+        if (beneficiary == address(0)) revert ZeroAddress();
+
+        // Ensure vesting wallet doesn't exist for the beneficiary
         require(
             address(vestingWallets[beneficiary]) == address(0),
             "Vesting wallet already exists"
         );
 
-        // Create a new instance of the VestingWalletCliffUpgradeable contract for the beneficiary.
+        // schdule validation
+        require(cliff >= start, "cliff>=start");
+
+        // Create a new vesting wallet for the beneficiary
         VestingWalletCliffUpgradeable vestingWallet = new VestingWalletCliffUpgradeable();
         vestingWallet.initialize(beneficiary, start, duration, cliff);
         vestingWallets[beneficiary] = vestingWallet;
@@ -82,26 +94,22 @@ contract MultiVestingWalletCliffV1 is OwnableUpgradeable {
         );
     }
 
-    /// @dev Releases the vested tokens for a given beneficiary. 
-    /// Can only be called once the cliff period is over and the beneficiary has vested tokens available.
-    /// @param beneficiary The address of the beneficiary whose tokens will be released.
-    function releaseVestedTokens(address beneficiary) external {
+    function releaseVestedTokens() external nonReentrant {
         VestingWalletCliffUpgradeable vestingWallet = vestingWallets[
-            beneficiary
+            msg.sender
         ];
         
         //Ensure that the beneficiary has an associated vesting wallet.
         require(
             address(vestingWallet) != address(0),
-            "No vesting wallet found for this beneficiary"
+            "No vesting wallet found"
         );
 
         //Calculate the amount of vested tokens that can be released and release them.
         uint256 amount = vestingWallet.releasable(address(tevaToken));
         vestingWallet.release(address(tevaToken));
 
-        // Emit an event signaling the release of vested tokens.
-        emit ReleasedVestedTokens(beneficiary, address(vestingWallet), amount);
+        emit ReleasedVestedTokens(msg.sender, address(vestingWallet), amount);
     }
 
     /// @dev Retrieves the total amount of tokens that have vested up to a given timestamp 
@@ -126,4 +134,7 @@ contract MultiVestingWalletCliffV1 is OwnableUpgradeable {
         // Return the amount of tokens vested for the beneficiary as of the given timestamp.
         return vestingWallet.vestedAmount(address(tevaToken), _timestamp);
     }
+
+    // Reserve storage space for future upgrades
+    uint256[50] private __gap;
 }

@@ -105,8 +105,8 @@ contract MultiVestingWalletCliffV1Test is Test {
         uint256 vestingAmount = 10 ether;
 
         // time-based vesting schdule
-        uint64 cliff = 90 days; // 3 months cliff period
-        uint64 startTime = uint64(block.timestamp) + cliff; // Current timestamp + cliff from where linear vesting start
+        uint64 cliff = uint64(block.timestamp) + 90 days; // 3 months cliff period
+        uint64 startTime = uint64(block.timestamp) + 60 days; // Current timestamp + 2 months
         uint64 duration = 365 days; // 1 year vesting period
 
         // Start creating the vesting wallet
@@ -151,8 +151,8 @@ contract MultiVestingWalletCliffV1Test is Test {
         uint256 vestingAmount = 100000000000000000;
 
         // time-based vesting schdule
-        uint64 cliff = 90 days; // 3 months cliff period
-        uint64 startTime = uint64(block.timestamp) + cliff; // Current timestamp + cliff from where linear vesting start
+        uint64 cliff = uint64(block.timestamp) + 90 days; // 3 months cliff period
+        uint64 startTime = uint64(block.timestamp) + 60 days; // Current timestamp + 2 months
         uint64 duration = 365 days; // 1 year vesting period
 
         // Start creating the vesting wallet
@@ -202,8 +202,8 @@ contract MultiVestingWalletCliffV1Test is Test {
         uint256 vestingAmount = 10 ether;
 
         // time-based vesting schdule
-        uint64 cliff = 90 days; // 3 months cliff period
-        uint64 startTime = uint64(block.timestamp) + cliff; // Current timestamp + cliff from where linear vesting start
+        uint64 cliff = uint64(block.timestamp) + 90 days; // 3 months cliff period
+        uint64 startTime = uint64(block.timestamp) + 60 days; // Current timestamp + 2 months
         uint64 duration = 365 days; // 1 year vesting period
 
         // Start creating the vesting wallet
@@ -256,8 +256,8 @@ contract MultiVestingWalletCliffV1Test is Test {
         uint256 vestingAmount = 100_000 ether;
 
         // time-based vesting schdule
-        uint64 cliff = 90 days; // 3 months cliff period
-        uint64 startTime = uint64(block.timestamp) + cliff; // Current timestamp + cliff from where linear vesting start
+        uint64 cliff = uint64(block.timestamp) + 90 days; // 3 months cliff period
+        uint64 startTime = uint64(block.timestamp) + 60 days; // Current timestamp + 2 months
         uint64 duration = 365 days; // 1 year vesting period
 
         // Start creating the vesting wallet
@@ -340,8 +340,8 @@ contract MultiVestingWalletCliffV1Test is Test {
         uint256 vestingAmount = 100_000 ether;
 
         // time-based vesting schdule
-        uint64 cliff = 90 days; // 3 months cliff period
-        uint64 startTime = uint64(block.timestamp) + cliff; // Current timestamp + cliff from where linear vesting start
+        uint64 cliff = uint64(block.timestamp) + 90 days; // 3 months cliff period
+        uint64 startTime = uint64(block.timestamp) + 60 days; // Current timestamp + 2 months
         uint64 duration = 365 days; // 1 year vesting period
 
         // Start creating the vesting wallet
@@ -382,8 +382,8 @@ contract MultiVestingWalletCliffV1Test is Test {
 
     function testCreateVestingWalletForThreeBeneficiary() public {
         // time-based vesting schdule : Same Vesting Amount for all three
-        uint64 cliff_1 = 90 days; // 3 months cliff period
-        uint64 startTime_1 = uint64(block.timestamp) + cliff_1; // Current timestamp
+        uint64 cliff_1 = uint64(block.timestamp) + 90 days; // 3 months cliff period
+        uint64 startTime_1 = uint64(block.timestamp) + 60 days; // Current timestamp + 2 months
         uint64 duration_1 = 365 days; // 1 year vesting period
         uint256 vestingAmount = 100000000000000000000; // 100 ether
 
@@ -412,8 +412,8 @@ contract MultiVestingWalletCliffV1Test is Test {
 
         // Beneficiary 2
         // time-based vesting schdule
-        uint64 cliff_2 = 90 days; // 3 months cliff period
-        uint64 startTime_2 = uint64(block.timestamp) + cliff_2; // Current timestamp
+        uint64 cliff_2 = uint64(block.timestamp) + 90 days; // 3 months cliff period
+        uint64 startTime_2 = uint64(block.timestamp) + 60 days; // Current timestamp + 2 months
         uint64 duration_2 = 365 days; // 1 year vesting period
 
         // Start creating the vesting wallet
@@ -442,8 +442,8 @@ contract MultiVestingWalletCliffV1Test is Test {
 
         // Beneficiary 3
         // time-based vesting schdule
-        uint64 cliff_3 = 90 days; // 3 months cliff period
-        uint64 startTime_3 = uint64(block.timestamp) + cliff_3; // Current timestamp
+        uint64 cliff_3 = uint64(block.timestamp) + 90 days; // 3 months cliff period
+        uint64 startTime_3 = uint64(block.timestamp) + 60 days; // Current timestamp + 2 months
         uint64 duration_3 = 365 days; // 1 year vesting period
 
         // Start creating the vesting wallet
@@ -478,8 +478,8 @@ contract MultiVestingWalletCliffV1Test is Test {
         uint256 vestingAmount = 100 ether;
 
         /// time-based vesting schdule
-        uint64 cliff = 90 days; // 3 months cliff period
-        uint64 startTime = uint64(block.timestamp) + cliff; // Current timestamp + cliff from where linear vesting start
+        uint64 cliff = uint64(block.timestamp) + 90 days; // 3 months cliff period
+        uint64 startTime = uint64(block.timestamp) + 60 days; // Current timestamp + 2 months
         uint64 duration = 365 days; // 1 year vesting period
 
         // Create vesting wallet and assign tokens
@@ -493,18 +493,10 @@ contract MultiVestingWalletCliffV1Test is Test {
         );
 
         // Fast-forward time to after the cliff
-        vm.warp(startTime + 1 days);
         // Release vested tokens for beneficiary1
-        emit ReleasedVestedTokens(
-            BENEFICIARY_1,
-            address(multiVestingWallet.vestingWallets(BENEFICIARY_1)),
-            uint256(
-                VestingWalletCliffUpgradeable(
-                    multiVestingWallet.vestingWallets(BENEFICIARY_1)
-                ).releasable(address(token))
-            )
-        );
-        multiVestingWallet.releaseVestedTokens(BENEFICIARY_1);
+        vm.prank(BENEFICIARY_1);
+        vm.warp(startTime + 91 days);  // cliff for 90 days
+        multiVestingWallet.releaseVestedTokens();
         // Check the beneficiary's balance for released tokens
         uint256 beneficiaryBalance = token.balanceOf(BENEFICIARY_1);
         assertGt(beneficiaryBalance, 0, "Vested tokens should be released");
@@ -513,7 +505,7 @@ contract MultiVestingWalletCliffV1Test is Test {
     function testErrorForNotCreatedWalletOnReleaseVestedTokensCall() public {
         // Release vested tokens for beneficiary1
         vm.expectRevert();
-        multiVestingWallet.releaseVestedTokens(BENEFICIARY_1);
+        multiVestingWallet.releaseVestedTokens();
     }
 
     function testVestedAmount() public {
@@ -521,8 +513,8 @@ contract MultiVestingWalletCliffV1Test is Test {
         uint256 vestingAmount = 1000000000000000000000; // 1000 ether
 
         // time-based vesting schdule
-        uint64 cliff = 90 days; // 3 months cliff period
-        uint64 startTime = uint64(block.timestamp) + cliff; // Current timestamp
+        uint64 cliff = uint64(block.timestamp) + 90 days; // 3 months cliff period
+        uint64 startTime = uint64(block.timestamp) + 60 days; // Current timestamp + 2 months
         uint64 duration = 365 days; // 1 year vesting period
 
         // Start creating the vesting wallet
