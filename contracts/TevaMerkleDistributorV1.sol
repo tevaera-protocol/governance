@@ -108,7 +108,7 @@ contract TevaMerkleDistributorV1 is
         uint256 _windowStart,
         uint256 _windowEnd
     ) external initializer {
-        __EIP712_init("MerkleDistributor", "1");
+        __EIP712_init("TevaAirdropClaim", "1");
         __Nonces_init();
         __Ownable_init(msg.sender);
         TOKEN = _token;
@@ -374,4 +374,6 @@ contract TevaMerkleDistributorV1 is
             revert MerkleDistributor__InvalidSignature();
         }
     }
+    /// @notice Reserve storage space to allow for layout changes in upgrades
+    uint256[50] private __gap;
 }
