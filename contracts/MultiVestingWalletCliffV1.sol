@@ -11,8 +11,8 @@ contract MultiVestingWalletCliffV1 is
     ReentrancyGuardUpgradeable
 {
     TevaTokenV1 public tevaToken;
-    
-    /// @dev Mapping to track vesting wallets for each beneficiary. 
+
+    /// @dev Mapping to track vesting wallets for each beneficiary.
     /// Each beneficiary address maps to their respective `VestingWalletCliffUpgradeable` contract.
     mapping(address => VestingWalletCliffUpgradeable) public vestingWallets;
 
@@ -45,12 +45,12 @@ contract MultiVestingWalletCliffV1 is
 
     function initialize(address _tevaToken) external initializer {
         __Ownable_init(msg.sender);
-        __ReentrancyGuard_init(); 
+        __ReentrancyGuard_init();
         tevaToken = TevaTokenV1(_tevaToken);
     }
 
     /// @dev Creates a new vesting wallet for a specified beneficiary.
-    /// Can only be called by the contract owner. The vesting schedule is defined by the start time, 
+    /// Can only be called by the contract owner. The vesting schedule is defined by the start time,
     /// duration, cliff period, and the number of tokens to be vested.
     /// @param beneficiary The address of the beneficiary who will receive the vested tokens.
     /// @param start The start time of the vesting schedule (in UNIX timestamp).
@@ -73,8 +73,13 @@ contract MultiVestingWalletCliffV1 is
             "Vesting wallet already exists"
         );
 
-        // schdule validation
+        // schdule validation and cliff after start and before end
         require(cliff >= start, "cliff>=start");
+
+        require(
+            cliff <= start + duration,
+            "cliff must not exceed vesting end time"
+        );
 
         // Create a new vesting wallet for the beneficiary
         VestingWalletCliffUpgradeable vestingWallet = new VestingWalletCliffUpgradeable();
@@ -98,7 +103,7 @@ contract MultiVestingWalletCliffV1 is
         VestingWalletCliffUpgradeable vestingWallet = vestingWallets[
             msg.sender
         ];
-        
+
         //Ensure that the beneficiary has an associated vesting wallet.
         require(
             address(vestingWallet) != address(0),
@@ -112,7 +117,7 @@ contract MultiVestingWalletCliffV1 is
         emit ReleasedVestedTokens(msg.sender, address(vestingWallet), amount);
     }
 
-    /// @dev Retrieves the total amount of tokens that have vested up to a given timestamp 
+    /// @dev Retrieves the total amount of tokens that have vested up to a given timestamp
     /// for a specific beneficiary.
     /// @param beneficiary The address of the beneficiary whose vested amount is being queried.
     /// @param _timestamp The UNIX timestamp up to which the vested amount is calculated.
@@ -124,7 +129,7 @@ contract MultiVestingWalletCliffV1 is
         VestingWalletCliffUpgradeable vestingWallet = vestingWallets[
             beneficiary
         ];
-        
+
         //Ensure that the beneficiary has an associated vesting wallet.
         require(
             address(vestingWallet) != address(0),
