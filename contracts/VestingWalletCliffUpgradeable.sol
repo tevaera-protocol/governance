@@ -11,7 +11,7 @@ import "@openzeppelin/contracts-upgradeable/finance/VestingWalletUpgradeable.sol
  */
 contract VestingWalletCliffUpgradeable is VestingWalletUpgradeable {
     using SafeCast for *;
-
+    address public multiVestingWalletAddress;
     /// @custom:storage-location erc7201:openzeppelin.storage.VestingWalletCliff
     /// @dev This structure stores the cliff timestamp in a custom storage location to extend the base storage of VestingWalletUpgradeable.
     struct VestingWalletCliffStorage {
@@ -50,6 +50,7 @@ contract VestingWalletCliffUpgradeable is VestingWalletUpgradeable {
      */
     function initialize(
         address beneficiaryAddress,
+        address _multiVestingWalletAddress,
         uint64 vestingStartTime,
         uint64 linearVestingDurationSeconds,
         uint64 cliffEndTime
@@ -62,6 +63,15 @@ contract VestingWalletCliffUpgradeable is VestingWalletUpgradeable {
             linearVestingDurationSeconds
         );
         $._cliff = cliffEndTime;
+        multiVestingWalletAddress =_multiVestingWalletAddress;
+    }
+
+     function changeOwner(address _newOwner) external {
+        require(msg.sender == multiVestingWalletAddress, "caller must be multiVestingWallet" );
+        if (_newOwner == address(0)) {
+            revert OwnableInvalidOwner(address(0));
+        }
+        _transferOwnership(_newOwner);
     }
 
     /**

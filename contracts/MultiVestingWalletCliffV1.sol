@@ -40,6 +40,12 @@ contract MultiVestingWalletCliffV1 is
         uint256 amount
     );
 
+    event ChangeBeneficiaryAddress(
+        address indexed vestingWalletcliff,
+        address indexed newBeneficiary,
+        address indexed oldBeneficiary
+    );
+
     /// @dev Zero Address
     error ZeroAddress();
 
@@ -83,7 +89,13 @@ contract MultiVestingWalletCliffV1 is
 
         // Create a new vesting wallet for the beneficiary
         VestingWalletCliffUpgradeable vestingWallet = new VestingWalletCliffUpgradeable();
-        vestingWallet.initialize(beneficiary, start, duration, cliff);
+        vestingWallet.initialize(
+            beneficiary,
+            address(this),
+            start,
+            duration,
+            cliff
+        );
         vestingWallets[beneficiary] = vestingWallet;
 
         // Mint tokens to the vesting wallet, locking them for the vesting schedule.
@@ -115,6 +127,47 @@ contract MultiVestingWalletCliffV1 is
         vestingWallet.release(address(tevaToken));
 
         emit ReleasedVestedTokens(msg.sender, address(vestingWallet), amount);
+    }
+
+    function changeBeneficiaryOfVestingWallet(
+        address _newBeneficiary,
+        address _oldBeneficiary
+    ) external onlyOwner {
+        require(
+            _newBeneficiary != address(0) && _oldBeneficiary != address(0),
+            "invalid zero address"
+        );
+        VestingWalletCliffUpgradeable vestingWallet = vestingWallets[
+            _oldBeneficiary
+        ];
+
+        //Ensure that old beneficiary has an associated vesting wallet.
+        require(
+            address(vestingWallet) != address(0),
+            "No vesting wallet correspond to oldBeneficiary "
+        );
+
+        VestingWalletCliffUpgradeable newBeneficiaryVestingWallet = vestingWallets[
+            _newBeneficiary
+        ];
+
+        //Ensure that new beneficiary has no associated vesting wallet.
+        require(
+            address(newBeneficiaryVestingWallet) == address(0),
+            "vesting wallet correspond to newBeneficiary"
+        );
+
+        vestingWallet.changeOwner(_newBeneficiary);
+
+        vestingWallets[_newBeneficiary] = vestingWallet;
+        
+        delete vestingWallets[_oldBeneficiary];
+
+        emit ChangeBeneficiaryAddress(
+            address(vestingWallet),
+            _newBeneficiary,
+            _oldBeneficiary
+        );
     }
 
     /// @dev Retrieves the total amount of tokens that have vested up to a given timestamp
