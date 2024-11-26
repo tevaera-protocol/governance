@@ -761,7 +761,7 @@ contract MultiVestingWalletCliffV1Test is Test {
     {
         // change beneficiary
         vm.prank(OWNER);
-        vm.expectRevert("No vesting wallet correspond to oldBeneficiary");
+        vm.expectRevert("No vesting wallet correspond to oldBeneficiary ");
         multiVestingWallet.changeBeneficiaryOfVestingWallet(
             BENEFICIARY_2,
             BENEFICIARY_1
