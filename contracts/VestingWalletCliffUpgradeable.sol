@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.26;
 
-import "@openzeppelin/contracts/utils/math/SafeCast.sol";
 import "@openzeppelin/contracts-upgradeable/finance/VestingWalletUpgradeable.sol";
 
 /**
@@ -10,7 +9,6 @@ import "@openzeppelin/contracts-upgradeable/finance/VestingWalletUpgradeable.sol
  * where no tokens are vested until the cliff period has passed.
  */
 contract VestingWalletCliffUpgradeable is VestingWalletUpgradeable {
-    using SafeCast for *;
     address public multiVestingWalletAddress;
     /// @custom:storage-location erc7201:openzeppelin.storage.VestingWalletCliff
     /// @dev This structure stores the cliff timestamp in a custom storage location to extend the base storage of VestingWalletUpgradeable.
