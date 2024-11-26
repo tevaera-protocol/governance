@@ -83,6 +83,15 @@ contract TevaTokenV1Test is Test {
         assertEq(token.totalSupply(), 100 * 10 ** 18);
     }
 
+    function testRevertMintingIfZeroAddress() public {
+        // Grant the MINTER_ROLE to the MINTER address
+        token.grantRole(MINTER_ROLE, MINTER);
+        // Mint tokens
+        vm.prank(MINTER);
+        vm.expectRevert();
+        token.mint(address(0), 100 * 10 ** 18);
+    }
+
     function testMintingBeyondCapFails() public {
         // Grant the MINTER_ROLE to the MINTER address
         token.grantRole(MINTER_ROLE, MINTER);
@@ -138,6 +147,17 @@ contract TevaTokenV1Test is Test {
         assertEq(token.totalSupply(), 50 * 10 ** 18);
     }
 
+    function testRevertIfZeroAddressOnBurn() public {
+        // Grant roles for minting and burning
+        token.grantRole(MINTER_ROLE, MINTER);
+        token.grantRole(BURNER_ROLE, BURNER);
+
+        // Burn tokens
+        vm.prank(BURNER);
+        vm.expectRevert();
+        token.burn(address(0), 50 * 10 ** 18);
+    }
+
     function testBurningWithoutRoleFails() public {
         // Grant only the MINTER_ROLE
         token.grantRole(MINTER_ROLE, MINTER);
@@ -158,6 +178,13 @@ contract TevaTokenV1Test is Test {
         token.burn(USER, 50 * 10 ** 18);
     }
 
+    /*//////////////////////////////////////////////////////////////
+                      CLOCK MODE TEST CASE 
+    //////////////////////////////////////////////////////////////*/
+    function testClockMode() public {
+        assertEq(token.CLOCK_MODE(), "mode=timestamp");
+        assertEq(token.clock(), block.timestamp);
+    }
     /*//////////////////////////////////////////////////////////////
                       ROLE MANAGEMENT TEST CASE 
     //////////////////////////////////////////////////////////////*/

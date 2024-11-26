@@ -207,6 +207,45 @@ contract MultiVestingWalletCliffV1Test is Test {
         );
     }
 
+    function testRevertCreateWalletIfCliffIsMoreThanStart() public {
+        // Set token transfer amount
+        uint256 vestingAmount = 100000000000000000;
+
+        // time-based vesting schdule
+        uint64 startTime = uint64(block.timestamp) + 90 days; // Current timestamp + cliff from where linear vesting start
+        uint64 cliff = startTime - 1 days; // cliff more than start
+        uint64 duration = 365 days; // 1 year vesting period
+
+        vm.prank(OWNER);
+        vm.expectRevert("cliff>=start");
+        multiVestingWallet.createVestingWallet(
+            BENEFICIARY_1,
+            startTime,
+            duration,
+            cliff,
+            vestingAmount
+        );
+    }
+
+    function testRevertCreateWalletIfCliffIsMoreThanEnd() public {
+        // Set token transfer amount
+        uint256 vestingAmount = 100000000000000000;
+
+        // time-based vesting schdule
+        uint64 startTime = uint64(block.timestamp) + 90 days; // Current timestamp + cliff from where linear vesting start
+        uint64 duration = 365 days; // 1 year vesting period
+        uint64 cliff = startTime + duration + 1 days; //cliff more than end
+        vm.prank(OWNER);
+        vm.expectRevert("cliff must not exceed vesting end time");
+        multiVestingWallet.createVestingWallet(
+            BENEFICIARY_1,
+            startTime,
+            duration,
+            cliff,
+            vestingAmount
+        );
+    }
+
     function testOwnerOfCreatedVestingWallet() public {
         // Set token transfer amount
         uint256 vestingAmount = 10 ether;
@@ -558,6 +597,15 @@ contract MultiVestingWalletCliffV1Test is Test {
             "Expected Vested Amount Should be Equal to Vested Amount"
         );
     }
+
+    function testRevertIfNoVestingWalletExistOnVestedAmount() public {
+        // Check the vested amount for beneficiary1
+        vm.expectRevert("No vesting wallet found for this beneficiary");
+        multiVestingWallet.vestedAmount(
+            BENEFICIARY_1,
+            uint64(block.timestamp)
+        );
+    }
     /*//////////////////////////////////////////////////////////////
                 CHANGE BENEFICIARY ADDRESS
     //////////////////////////////////////////////////////////////*/
@@ -690,6 +738,82 @@ contract MultiVestingWalletCliffV1Test is Test {
         // Check the beneficiary's balance for released tokens
         uint256 beneficiary2Balance = token.balanceOf(BENEFICIARY_2);
         assertGt(beneficiary2Balance, 0, "Vested tokens should be released");
+    }
+    function testRevertOnInvalidAddressOnChangeBeneficiaryAddress() public {
+        // change beneficiary
+        vm.prank(OWNER);
+        vm.expectRevert("invalid zero address");
+        multiVestingWallet.changeBeneficiaryOfVestingWallet(
+            address(0),
+            BENEFICIARY_1
+        );
+
+        vm.prank(OWNER);
+        vm.expectRevert("invalid zero address");
+        multiVestingWallet.changeBeneficiaryOfVestingWallet(
+            BENEFICIARY_1,
+            address(0)
+        );
+    }
+
+    function testRevertIfNoVestingWalletExistToOldBeneficiaryOnChangeBeneficiaryAddress()
+        public
+    {
+        // change beneficiary
+        vm.prank(OWNER);
+        vm.expectRevert("No vesting wallet correspond to oldBeneficiary");
+        multiVestingWallet.changeBeneficiaryOfVestingWallet(
+            BENEFICIARY_2,
+            BENEFICIARY_1
+        );
+    }
+
+    function testRevertIfAlreadyExistAVestingWalletToNewBeneficiaryOnChangeBeneficiaryAddress()
+        public
+    {
+        // Set token transfer amount
+        uint256 vestingAmount = 10 ether;
+
+        // time-based vesting schdule
+        uint64 cliff = uint64(block.timestamp) + 90 days; // 3 months cliff period
+        uint64 startTime = uint64(block.timestamp) + 60 days; // Current timestamp + 2 months
+        uint64 duration = 365 days; // 1 year vesting period
+
+        // Start creating the vesting wallet
+        vm.prank(OWNER);
+        multiVestingWallet.createVestingWallet(
+            BENEFICIARY_1,
+            startTime,
+            duration,
+            cliff,
+            vestingAmount
+        );
+
+        vm.prank(OWNER);
+        multiVestingWallet.createVestingWallet(
+            BENEFICIARY_2,
+            startTime,
+            duration,
+            cliff,
+            vestingAmount
+        );
+        assertEq(
+            address(
+                VestingWalletCliffUpgradeable(
+                    multiVestingWallet.vestingWallets(BENEFICIARY_1)
+                ).owner()
+            ),
+            BENEFICIARY_1,
+            "Incorrect token balance in vesting wallet"
+        );
+
+        // change beneficiary
+        vm.prank(OWNER);
+        vm.expectRevert("vesting wallet correspond to newBeneficiary");
+        multiVestingWallet.changeBeneficiaryOfVestingWallet(
+            BENEFICIARY_2,
+            BENEFICIARY_1
+        );
     }
 
     function _createWallet(
