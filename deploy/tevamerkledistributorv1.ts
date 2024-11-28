@@ -17,7 +17,7 @@ export default async function (hre: HardhatRuntimeEnvironment) {
   const proxyAdminContractAddress = process.env.PROXY_ADMIN_CONTRACT_ADDRESS;
   if (!proxyAdminContractAddress)
     throw new Error("Please set proxyAdminContractAddress");
-  const tevaToken = process.env.TEVA_TOKEN_CONTRACT_ADDRESS;
+  const tevaToken = process.env.TEVA_TOKEN_CONTRACT;
   if (!tevaToken) throw new Error("Please set teva token address");
   const merkelRoot = process.env.MERKEL_ROOT;
   if (!merkelRoot) throw new Error("Please set merkel root");

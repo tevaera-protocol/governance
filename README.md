@@ -33,7 +33,10 @@ To deploy the separate contracts, run in terminal: -
 > yarn hardhat deploy-zksync --script <scriptName> --network <network_name>
 
 Ex: yarn hardhat deploy-zksync --script zksync/citizenidv1_deploy.ts --network zksyncSepolia
+### Run Interaction Scripts Cases on zkSync
+> yarn hardhat run filePath
 
+Ex: yarn hardhat run ./scripts/tgeTevaConfiguration.ts   
 ### Run Test Cases on zkSync
 Local Set up 
 > foundryup-zksync --branch main

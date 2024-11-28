@@ -18,7 +18,7 @@ export default async function (hre: HardhatRuntimeEnvironment) {
   const proxyAdminContractAddress = process.env.PROXY_ADMIN_CONTRACT_ADDRESS;
   if (!proxyAdminContractAddress)
     throw new Error("Please set proxyAdminContractAddress");
-  const tevaTokenContract = process.env.TEVA_TOKEN_CONTRACT_ADDRESS;
+  const tevaTokenContract = process.env.TEVA_TOKEN_CONTRACT;
   if (!tevaTokenContract) throw new Error("Please set tevaTokenContract");
 
   // Initialize the safeWallet.

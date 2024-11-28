@@ -13,7 +13,7 @@ async function run() {
   const provider = new Provider(process.env.ZKSYNC_PROVIDER_URI);
   if (!provider) throw new Error("Please set zksync provider url");
 
-  const tevaContractAddress = process.env.TEVA_TOKEN_CONTRCAT;
+  const tevaContractAddress = process.env.TEVA_TOKEN_CONTRACT;
   if (!tevaContractAddress) throw new Error("Please set tevaContractAddress address");
 
   const tevaIntialTokenMintAmount = BigInt(process.env.TEVA_INITIAL_TOKEN_MINT_AMOUNT);
