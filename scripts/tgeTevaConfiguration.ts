@@ -1,3 +1,5 @@
+import { ethers } from "ethers";
+
 const { Contract, Provider, Wallet } = require("zksync-ethers");
 const dotenv = require("dotenv");
 
@@ -14,19 +16,35 @@ async function run() {
   if (!provider) throw new Error("Please set zksync provider url");
 
   const tevaContractAddress = process.env.TEVA_TOKEN_CONTRACT;
-  if (!tevaContractAddress) throw new Error("Please set tevaContractAddress address");
+  if (!tevaContractAddress)
+    throw new Error("Please set tevaContractAddress address");
 
-  const tevaIntialTokenMintAmount = BigInt(process.env.TEVA_INITIAL_TOKEN_MINT_AMOUNT);
-  if (!tevaIntialTokenMintAmount) throw new Error("Please set tevaIntialTokenMintAmount address");
+  const tevaIntialTokenMintAmount = process.env.TEVA_INITIAL_TOKEN_MINT_AMOUNT;
+  if (!tevaIntialTokenMintAmount)
+    throw new Error("Please set tevaIntialTokenMintAmount address");
 
-  const multiVestingContractAddress = process.env.MULTI_VESTING_CONTRACT_ADDRESS;
-  if (!multiVestingContractAddress) throw new Error("Please set multiVestingContractAddress address");
+  const multiVestingContractAddress =
+    process.env.MULTI_VESTING_CONTRACT_ADDRESS;
+  if (!multiVestingContractAddress)
+    throw new Error("Please set multiVestingContractAddress address");
 
-  const tevaMerkleDistributorContractAddress = process.env.TEVA_MERKLE_DISTRIBUTOR_CONTRACT_ADDRESS;
-  if (!tevaMerkleDistributorContractAddress) throw new Error("Please set tevaMerkleDistributorContractAddress address");
+  const tevaCommunityMerkleDistributorContractAddress =
+    process.env.TEVA_COMMUNITY_MERKLE_DISTRIBUTOR_CONTRACT_ADDRESS;
+  if (!tevaCommunityMerkleDistributorContractAddress)
+    throw new Error(
+      "Please set tevaCommunityMerkleDistributorContractAddress address"
+    );
+
+  const tevaInvestorMerkleDistributorContractAddress =
+    process.env.TEVA_INVESTOR_MERKLE_DISTRIBUTOR_CONTRACT_ADDRESS;
+  if (!tevaInvestorMerkleDistributorContractAddress)
+    throw new Error(
+      "Please set tevaInvestorMerkleDistributorContractAddress address"
+    );
 
   const dexContractAddress = process.env.DEX_CONTRACT_ADDRESS;
-  if (!dexContractAddress) throw new Error("Please set dexContractAddress address");
+  if (!dexContractAddress)
+    throw new Error("Please set dexContractAddress address");
 
   // Initialize the safeWallet.
   const contractAdminWallet = new Wallet(
@@ -47,21 +65,41 @@ async function run() {
     contractAdminWallet._signerL2()
   );
 
-  const addMinterRoleToMultiVestingTx = await tevaContract.grantRole(tevaContract.MINTER_ROLE(), multiVestingContractAddress);
+  const addMinterRoleToMultiVestingTx = await tevaContract.grantRole(
+    tevaContract.MINTER_ROLE(),
+    multiVestingContractAddress
+  );
   await addMinterRoleToMultiVestingTx.wait();
 
-  const addMinterRoleToTevaMerkleTx = await tevaContract.grantRole(tevaContract.MINTER_ROLE(), tevaMerkleDistributorContractAddress);
-  await addMinterRoleToTevaMerkleTx.wait();
+  const addMinterRoleToTevaCommunityMerkleTx = await tevaContract.grantRole(
+    tevaContract.MINTER_ROLE(),
+    tevaCommunityMerkleDistributorContractAddress
+  );
+  await addMinterRoleToTevaCommunityMerkleTx.wait();
 
-  const addMinterRoleToAdminWalletTx = await tevaContract.grantRole(tevaContract.MINTER_ROLE(), contractAdminWallet.getAddress());
+  const addMinterRoleToTevaInvestorMerkleTx = await tevaContract.grantRole(
+    tevaContract.MINTER_ROLE(),
+    tevaInvestorMerkleDistributorContractAddress
+  );
+  await addMinterRoleToTevaInvestorMerkleTx.wait();
+
+  const addMinterRoleToAdminWalletTx = await tevaContract.grantRole(
+    tevaContract.MINTER_ROLE(),
+    contractAdminWallet.getAddress()
+  );
   await addMinterRoleToAdminWalletTx.wait();
 
-  const mintTevaTx = await tevaContract.mint(contractAdminWallet.getAddress(), tevaIntialTokenMintAmount);
+  const mintTevaTx = await tevaContract.mint(
+    contractAdminWallet.getAddress(),
+    ethers.parseEther(tevaIntialTokenMintAmount)
+  );
   await mintTevaTx.wait();
 
-  const approveTevaToDexTx = await tevaContract.approve(dexContractAddress, tevaIntialTokenMintAmount);
+  const approveTevaToDexTx = await tevaContract.approve(
+    dexContractAddress,
+    ethers.parseEther(tevaIntialTokenMintAmount)
+  );
   await approveTevaToDexTx.wait();
-
 }
 
 run();

@@ -2,7 +2,7 @@ import { Provider, Wallet } from "zksync-ethers";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { Deployer } from "@matterlabs/hardhat-zksync-deploy";
 import * as dotenv from "dotenv";
-import { Contract } from "ethers";
+import { Contract, ethers } from "ethers";
 
 dotenv.config();
 
@@ -19,9 +19,9 @@ export default async function (hre: HardhatRuntimeEnvironment) {
     throw new Error("Please set proxyAdminContractAddress");
   const tevaToken = process.env.TEVA_TOKEN_CONTRACT;
   if (!tevaToken) throw new Error("Please set teva token address");
-  const merkelRoot = process.env.MERKEL_ROOT;
+  const merkelRoot = process.env.COMMUNITY_MERKEL_ROOT;
   if (!merkelRoot) throw new Error("Please set merkel root");
-  const maxClaimableAmount = process.env.MAX_CLAIMABLE_LIMIT;
+  const maxClaimableAmount = process.env.COMMUNITY_MAX_CLAIMABLE_LIMIT;
   if (!maxClaimableAmount) throw new Error("Pleae ste max claimable limit");
   const claimStart = process.env.CLAIM_START_TIME;
   if (!claimStart) throw new Error("Please set claim starting time");
@@ -126,7 +126,7 @@ export default async function (hre: HardhatRuntimeEnvironment) {
   const initializeTevaTokenTx = await nyContract.initialize(
     tevaToken,
     merkelRoot,
-    maxClaimableAmount,
+    ethers.parseEther(maxClaimableAmount),
     claimStart,
     claimEnd
   );
