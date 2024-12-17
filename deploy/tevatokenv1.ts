@@ -15,9 +15,7 @@ export default async function (hre: HardhatRuntimeEnvironment) {
   // environment variables
   const provider = new Provider(process.env.ZKSYNC_PROVIDER_URI);
   if (!provider) throw new Error("Please set zksync provider url");
-  const proxyAdminContractAddress = process.env.PROXY_ADMIN_CONTRACT_ADDRESS;
-  if (!proxyAdminContractAddress)
-    throw new Error("Please set proxyAdminContractAddress");
+  let proxyAdminContractAddress = process.env.PROXY_ADMIN_CONTRACT_ADDRESS;
 
   // Initialize the safeWallet.
   const proxyAdminWallet = new Wallet(
@@ -39,9 +37,33 @@ export default async function (hre: HardhatRuntimeEnvironment) {
   );
 
   // Initialize deployers
+  const proxyDeployer = new Deployer(hre, proxyAdminWallet);
   const contractDeployer = new Deployer(hre, contractAdminWallet);
 
-  // Deploy the simplifier kraken contract
+  if (!proxyAdminContractAddress) {
+    // Deploy the proxy admin
+    const proxyAdminArtifact = await proxyDeployer.loadArtifact(
+      "contracts/proxy/ProxyAdmin.sol:ProxyAdmin"
+    );
+    const proxyAdminConstArgs = [await proxyAdminWallet.getAddress()];
+    const proxyAdminContract = await proxyDeployer.deploy(
+      proxyAdminArtifact,
+      proxyAdminConstArgs
+    );
+    console.log(
+      `ProxyAdmin was deployed to ${await proxyAdminContract.getAddress()}`
+    );
+
+    const proxyVerifyRes = await hre.run("verify:verify", {
+      address: await proxyAdminContract.getAddress(),
+      constructorArguments: proxyAdminConstArgs,
+    });
+    proxyAdminContractAddress = await proxyAdminContract.getAddress();
+
+    console.log("Verification res: ", proxyVerifyRes);
+  }
+
+  // Deploy the teva token contract
   const TevaTokenArtifact = await contractDeployer.loadArtifact(
     "contracts/token/TevaTokenV1.sol:TevaTokenV1"
   );
@@ -51,8 +73,7 @@ export default async function (hre: HardhatRuntimeEnvironment) {
     TevaTokenConstArgs
   );
   console.log(
-    "args: " +
-      TevaTokenContract.interface.encodeDeploy(TevaTokenConstArgs)
+    "args: " + TevaTokenContract.interface.encodeDeploy(TevaTokenConstArgs)
   );
   console.log(
     `TevaToken was deployed to ${await TevaTokenContract.getAddress()}`

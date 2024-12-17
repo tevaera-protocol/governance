@@ -8,13 +8,14 @@ const ethers = require("ethers");
 dotenv.config();
 const TransparentUpgradeableProxy = require("../artifacts-zk/contracts/proxy/TransparentUpgradeableProxy.sol/TransparentUpgradeableProxy.json");
 
-// Note: Initialize and replace TEVA_TOKEN_CONTRACT_ADDRESS, TEVA_TIMELOCK_CONTRACT_ADDRESS from env
+// Note: Initialize and replace TEVA_TOKEN_CONTRACT, TEVA_TIMELOCK_CONTRACT_ADDRESS from env
 //  TEVA_VOTING_DELAY, TEVA_VOTING_PERIOD, TEVA_PROPOSAL_THRESHOLD,
 //  and TEVA_QUORUM_PERCENTAGE with actual values as per the project requirements.
 const TEVA_TOKEN_CONTRACT = process.env.TEVA_TOKEN_CONTRACT; // Teva Token Contract Address
-const TEVA_TIMELOCK_CONTRACT_ADDRESS = process.env.TEVA_TIMELOCK_CONTRACT_ADDRESS;  // Teva Time lockController Address
-const TEVA_VOTING_DELAY = 300n;   // Number of blocks in between
-const TEVA_VOTING_PERIOD = 604800n;  // Numbers of blocks in between when voting remains valid  
+const TEVA_TIMELOCK_CONTRACT_ADDRESS =
+  process.env.TEVA_TIMELOCK_CONTRACT_ADDRESS; // Teva Time lockController Address
+const TEVA_VOTING_DELAY = 300n; // Number of blocks in between
+const TEVA_VOTING_PERIOD = 604800n; // Numbers of blocks in between when voting remains valid
 const TEVA_PROPOSAL_THRESHOLD = ethers.parseUnits("1000", 18); // Token value :1000
 const TEVA_QUORUM_PERCENTAGE = 4n; // quorum percentage
 
@@ -64,7 +65,7 @@ export default async function (hre: HardhatRuntimeEnvironment) {
   );
   console.log(
     "args: " +
-    TevaGovernorContract.interface.encodeDeploy(TevaGovernorConstArgs)
+      TevaGovernorContract.interface.encodeDeploy(TevaGovernorConstArgs)
   );
   console.log(
     `TevaGovernor was deployed to ${await TevaGovernorContract.getAddress()}`
@@ -116,8 +117,18 @@ export default async function (hre: HardhatRuntimeEnvironment) {
     NY_ABI,
     contractAdminWallet._signerL2()
   );
-  
-  const initializeTevaGovernorTx = await nyContract.initialize(TEVA_TOKEN_CONTRACT, TEVA_TIMELOCK_CONTRACT_ADDRESS, TEVA_VOTING_DELAY, TEVA_VOTING_PERIOD, TEVA_PROPOSAL_THRESHOLD, TEVA_QUORUM_PERCENTAGE);
+
+  const initializeTevaGovernorTx = await nyContract.initialize(
+    TEVA_TOKEN_CONTRACT,
+    TEVA_TIMELOCK_CONTRACT_ADDRESS,
+    TEVA_VOTING_DELAY,
+    TEVA_VOTING_PERIOD,
+    TEVA_PROPOSAL_THRESHOLD,
+    TEVA_QUORUM_PERCENTAGE
+  );
   await initializeTevaGovernorTx.wait();
-  console.log("TevaGovernor initialization response: ", initializeTevaGovernorTx);
+  console.log(
+    "TevaGovernor initialization response: ",
+    initializeTevaGovernorTx
+  );
 }
