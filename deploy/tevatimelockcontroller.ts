@@ -7,7 +7,7 @@ dotenv.config();
 const TransparentUpgradeableProxy = require("../artifacts-zk/contracts/proxy/TransparentUpgradeableProxy.sol/TransparentUpgradeableProxy.json");
 
 // Note : Initialize, Replace minDelay, proposers and executors as per requirement
-const MIN_DELAY = 300n; // 300 seconds
+const MIN_DELAY = BigInt(process.env.TEVA_TIMELOCK_EXECUTION_DELAY); // 1 days
 const PROPOSERS_ADDRESS_ARRAY = JSON.parse(process.env.PROPOSERS_ADDRESS_ARRAY);  // proposers address array
 const EXECUTORS_ADDRESS_ARRAY = JSON.parse(process.env.EXECUTORS_ADDRESS_ARRAY); // executors address array
 console.log("PROPOSERS_ADDRESS_ARRAY", PROPOSERS_ADDRESS_ARRAY);

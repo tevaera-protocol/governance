@@ -12,12 +12,11 @@ const TransparentUpgradeableProxy = require("../artifacts-zk/contracts/proxy/Tra
 //  TEVA_VOTING_DELAY, TEVA_VOTING_PERIOD, TEVA_PROPOSAL_THRESHOLD,
 //  and TEVA_QUORUM_PERCENTAGE with actual values as per the project requirements.
 const TEVA_TOKEN_CONTRACT = process.env.TEVA_TOKEN_CONTRACT; // Teva Token Contract Address
-const TEVA_TIMELOCK_CONTRACT_ADDRESS =
-  process.env.TEVA_TIMELOCK_CONTRACT_ADDRESS; // Teva Time lockController Address
-const TEVA_VOTING_DELAY = 300n; // Number of blocks in between
-const TEVA_VOTING_PERIOD = 604800n; // Numbers of blocks in between when voting remains valid
-const TEVA_PROPOSAL_THRESHOLD = ethers.parseUnits("1000", 18); // Token value :1000
-const TEVA_QUORUM_PERCENTAGE = 4n; // quorum percentage
+const TEVA_TIMELOCK_CONTRACT_ADDRESS = process.env.TEVA_TIMELOCK_CONTRACT_ADDRESS; // Teva Time lockController Address
+const TEVA_VOTING_DELAY = BigInt(process.env.TEVA_VOTING_DELAY); // Number of blocks in between :300n
+const TEVA_VOTING_PERIOD = BigInt(process.env.TEVA_VOTING_PERIOD); // Numbers of blocks in between when voting remains valid : 604800n
+const TEVA_PROPOSAL_THRESHOLD = BigInt(process.env.TEVA_PROPOSAL_THRESHOLD); // Token value :1000 ethers.parseUnits("1000", 18);
+const TEVA_QUORUM_PERCENTAGE = BigInt(process.env.TEVA_QUORUM_PERCENTAGE); // quorum percentage :
 
 // An example of a deploy script that will deploy and call a simple contract.
 export default async function (hre: HardhatRuntimeEnvironment) {
