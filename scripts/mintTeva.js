@@ -10,7 +10,7 @@ const TT_ABI = TT_JSON.abi;
 const mintTeva = async () => {
   console.log(`Minting tokens...`);
 
-  const receiver = "0xF9BdCbFEcB97ADE979BbCbD0bBdba5a83139a0bf";
+  const receiver = "<wallet_address>";
   const amount = 140_000_000;
   const amountWei = ethers.parseEther(amount.toString());
 
