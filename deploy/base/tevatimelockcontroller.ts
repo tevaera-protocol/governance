@@ -3,7 +3,7 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import * as dotenv from "dotenv";
 
 dotenv.config();
-const TransparentUpgradeableProxy = require("../artifacts/contracts/proxy/TransparentUpgradeableProxy.sol/TransparentUpgradeableProxy.json");
+const TransparentUpgradeableProxy = require("../../artifacts/contracts/proxy/TransparentUpgradeableProxy.sol/TransparentUpgradeableProxy.json");
 const TeveTimelockControllerV1 = require("../../artifacts/contracts/TeveTimelockControllerV1.sol/TeveTimelockControllerV1.json");
 // An example of a deploy script that will deploy and call a simple contract.
 async function main(hre: HardhatRuntimeEnvironment) {

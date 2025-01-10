@@ -73,6 +73,7 @@ async function main(hre: HardhatRuntimeEnvironment) {
   //   verify contract
   try {
     await hre.run("verify:verify", {
+      constract:"contracts/TevaMerkleDistributorV2.sol:TevaMerkleDistributorV2",
       address: await tevaMerkleDistributorContract.getAddress(),
       constructorArguments: tevaMerkleDistributorArgs
     });

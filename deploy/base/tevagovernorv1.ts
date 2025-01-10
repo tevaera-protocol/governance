@@ -3,7 +3,7 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import * as dotenv from "dotenv";
 
 dotenv.config();
-const TransparentUpgradeableProxy = require("../artifacts/contracts/proxy/TransparentUpgradeableProxy.sol/TransparentUpgradeableProxy.json");
+const TransparentUpgradeableProxy = require("../../artifacts/contracts/proxy/TransparentUpgradeableProxy.sol/TransparentUpgradeableProxy.json");
 const TevaGovernorV1 = require("../../artifacts/contracts/TevaGovernorV1.sol/TevaGovernorV1.json");
 
 // An example of a deploy script that will deploy and call a simple contract.
@@ -26,7 +26,7 @@ async function main(hre: HardhatRuntimeEnvironment) {
   const tevaTokenContract = process.env.TEVA_TOKEN_CONTRACT; // Number of blocks in between
   if (!tevaTokenContract) throw new Error("Please set TEVA_TOKEN_CONTRACT");
   const tevaTimelockContract = process.env.TEVA_TIMELOCK_CONTRACT_ADDRESS; // Number of blocks in between
-  if (!tevaTimelockContract) throw new Error("Please set TEVA_TOKEN_CONTRACT");
+  if (!tevaTimelockContract) throw new Error("Please set TEVA_TIMELOCK_CONTRACT_ADDRESS");
   const tevaVotingPeriod = process.env.TEVA_VOTING_PERIOD; // Numbers of blocks in between when voting remains valid
   if (!tevaVotingPeriod) throw new Error("Please set TEVA_VOTING_PERIOD");
   let tevaProposalThresholdValue = process.env.TEVA_PROPOSAL_THRESHOLD;
@@ -87,62 +87,62 @@ async function main(hre: HardhatRuntimeEnvironment) {
     }
   }
 
-  // // Deploy the transparent proxy
-  // const transparentProxyConstArgs = [
-  //   await TevaGovernorContract.getAddress(),
-  //   proxyAdminContractAddress,
-  //   "0x",
-  // ];
-  // const transparentUpgradeableProxyFactory = new ethers.ContractFactory(
-  //   TransparentUpgradeableProxy.abi,
-  //   TransparentUpgradeableProxy.bytecode,
-  //   proxyAdminWallet
-  // );
-  // const transparentProxyContract =
-  //   await transparentUpgradeableProxyFactory.deploy(
-  //     await TevaGovernorContract.getAddress(),
-  //     proxyAdminContractAddress,
-  //     "0x"
-  //   );
-  // await transparentProxyContract.waitForDeployment();
-  // console.log(
-  //   "transparentUpgradeableProxy deployed at:",
-  //   await transparentProxyContract.getAddress()
-  // );
+  // Deploy the transparent proxy
+  const transparentProxyConstArgs = [
+    await TevaGovernorContract.getAddress(),
+    proxyAdminContractAddress,
+    "0x",
+  ];
+  const transparentUpgradeableProxyFactory = new ethers.ContractFactory(
+    TransparentUpgradeableProxy.abi,
+    TransparentUpgradeableProxy.bytecode,
+    proxyAdminWallet
+  );
+  const transparentProxyContract =
+    await transparentUpgradeableProxyFactory.deploy(
+      await TevaGovernorContract.getAddress(),
+      proxyAdminContractAddress,
+      "0x"
+    );
+  await transparentProxyContract.waitForDeployment();
+  console.log(
+    "transparentUpgradeableProxy deployed at:",
+    await transparentProxyContract.getAddress()
+  );
 
-  // try {
-  //   await hre.run("verify:verify", {
-  //     address: await transparentProxyContract.getAddress(),
-  //     constructorArguments: transparentProxyConstArgs,
-  //   });
-  // } catch (error: any) {
-  //   if (error.name === "ContractVerificationInvalidStatusCodeError") {
-  //     console.warn("Verification warning: Contract already verified or partially verified.");
-  //   } else {
-  //     console.error("Unexpected error during verification:", error);
-  //   }
-  // }
-  // // Initializing TevaGovernor contract through proxy
+  try {
+    await hre.run("verify:verify", {
+      address: await transparentProxyContract.getAddress(),
+      constructorArguments: transparentProxyConstArgs,
+    });
+  } catch (error: any) {
+    if (error.name === "ContractVerificationInvalidStatusCodeError") {
+      console.warn("Verification warning: Contract already verified or partially verified.");
+    } else {
+      console.error("Unexpected error during verification:", error);
+    }
+  }
+  // Initializing TevaGovernor contract through proxy
 
-  // const nyContract = new ethers.Contract(
-  //   await transparentProxyContract.getAddress(),
-  //   TevaGovernorV1.abi,
-  //   contractAdminWallet
-  // );
+  const nyContract = new ethers.Contract(
+    await transparentProxyContract.getAddress(),
+    TevaGovernorV1.abi,
+    contractAdminWallet
+  );
 
-  // const initializeTevaGovernorTx = await nyContract.initialize(
-  //   tevaTokenContract,
-  //   tevaTimelockContract,
-  //   tevaVotingDelay,
-  //   tevaVotingPeriod,
-  //   tevaProposalThreshold,
-  //   tevaQuorumPercentage
-  // );
-  // await initializeTevaGovernorTx.wait();
-  // console.log(
-  //   "TevaGovernor initialization response: ",
-  //   initializeTevaGovernorTx
-  // );
+  const initializeTevaGovernorTx = await nyContract.initialize(
+    tevaTokenContract,
+    tevaTimelockContract,
+    tevaVotingDelay,
+    tevaVotingPeriod,
+    tevaProposalThreshold,
+    tevaQuorumPercentage
+  );
+  await initializeTevaGovernorTx.wait();
+  console.log(
+    "TevaGovernor initialization response: ",
+    initializeTevaGovernorTx
+  );
 }
 main(require("hardhat")).catch((error) => {
   console.error(error);
