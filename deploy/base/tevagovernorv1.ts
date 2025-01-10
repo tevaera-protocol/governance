@@ -110,13 +110,18 @@ async function main(hre: HardhatRuntimeEnvironment) {
     await transparentProxyContract.getAddress()
   );
 
-  const verifyProxy = await hre.run("verify:verify", {
-    address: await transparentProxyContract.getAddress(),
-    constructorArguments: transparentProxyConstArgs,
-  });
-
-  console.log("Verification res: ", verifyProxy);
-
+  try {
+    await hre.run("verify:verify", {
+      address: await transparentProxyContract.getAddress(),
+      constructorArguments: transparentProxyConstArgs,
+    });
+  } catch (error: any) {
+    if (error.name === "ContractVerificationInvalidStatusCodeError") {
+      console.warn("Verification warning: Contract already verified or partially verified.");
+    } else {
+      console.error("Unexpected error during verification:", error);
+    }
+  }
   // Initializing TevaGovernor contract through proxy
 
   const nyContract = new ethers.Contract(

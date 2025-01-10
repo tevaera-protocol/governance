@@ -99,6 +99,7 @@ async function main(hre: HardhatRuntimeEnvironment) {
     proxyAdminContractAddress,
     "0x",
   );
+  await transparentProxyContract.waitForDeployment();
 
   console.log(
     "transparentUpgradeableProxy deployed at:",
