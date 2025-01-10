@@ -20,7 +20,7 @@ async function main(hre: HardhatRuntimeEnvironment) {
   if (!proxyAdminContractAddress)
     throw new Error("Please set proxyAdminContractAddress");
 
-  const layerzeroBaseEndpoint = process.env.LAYERZERO_BASE_ENDPOINT;
+  const layerzeroBaseEndpoint = process.env.LAYERZERO_BASE_ENDPOINT_V2;
   if (!layerzeroBaseEndpoint)
     throw new Error("Please set base layer zero endpoint");
 
@@ -117,8 +117,8 @@ async function main(hre: HardhatRuntimeEnvironment) {
     TevaTokenV2.abi,
     contractAdminWallet
   );
-
-  const initializeTevaTokenTx = await nyContract.initialize();
+  const oAppOwner = await contractAdminWallet.getAddress();
+  const initializeTevaTokenTx = await nyContract.initialize(oAppOwner);
   await initializeTevaTokenTx.wait();
   console.log("TevaToken initialization response: ", initializeTevaTokenTx);
 }

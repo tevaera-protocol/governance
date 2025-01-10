@@ -32,11 +32,11 @@ To compile all the contracts, run in terminal: -
 To deploy the separate contracts, run in terminal: -
 > npx hardhat run deploy/<scriptPath> --network <network_name>
 
-Ex: npx hardhat run deploy/base/multivestingwalletv1.ts --network base-sepolia
+Ex: npx hardhat run deploy/base/multivestingwalletv1.ts --network base-sepolia 
 ### Run Interaction Scripts Cases on zkSync
 > npx hardhat run filePath --network <network_name>
 
-Ex: yarn hardhat run ./scripts/tgeTevaConfiguration.ts  --network <network_name>
+Ex: yarn hardhat run ./scripts/tgeTevaConfiguration.ts  --network <network_name> 
 ### Run Test Cases on zkSync
 Local Set up 
 > foundryup-zksync --branch main
