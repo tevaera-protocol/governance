@@ -71,7 +71,7 @@ contract TevaTokenV2 is
     /// @dev The initializer function that replaces the constructor for upgradeable contracts.
     /// It initializes the token with the name "Tevaera" and symbol "Teva",
     /// along with setting up the roles and initializing inherited modules.
-    function initialize() public initializer {
+    function initialize(address _oAppOwner) public initializer {
         __ERC20_init("Tevaera", "TEVA");
         __ERC20Burnable_init();
         __ERC20Votes_init();
@@ -86,10 +86,7 @@ contract TevaTokenV2 is
         // Setting up role hierarchies: MINTER_ROLE and BURNER_ROLE admin control is granted to specific roles.
         _setRoleAdmin(MINTER_ROLE, MINTER_ADMIN_ROLE);
         _setRoleAdmin(BURNER_ROLE, BURNER_ADMIN_ROLE);
-    }
-
-    function initializeV2(address _delegate) external reinitializer(2) {
-        __OFTCore_init(_delegate);
+        __OFTCore_init(_oAppOwner);
         __Ownable_init(msg.sender);
     }
 

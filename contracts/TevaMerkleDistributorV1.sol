@@ -10,7 +10,7 @@ import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-import "./token/TevaTokenV1.sol";
+import "./token/TevaTokenV2.sol";
 
 /// @title TevaMerkleDistributorV1
 /// @notice A contract that allows a user to claim a token distribution against a Merkle tree root.
@@ -48,7 +48,7 @@ contract TevaMerkleDistributorV1 is
         );
 
     /// @notice The token contract for the tokens to be claimed / distributed.
-    TevaTokenV1 public TOKEN;
+    TevaTokenV2 public TOKEN;
 
     /// @notice The Merkle root for the distribution.
     bytes32 public MERKLE_ROOT;
@@ -102,7 +102,7 @@ contract TevaMerkleDistributorV1 is
     /// @param _windowStart The start of the time window during which claims may be made.
     /// @param _windowEnd The end of the time window during which claims may be made.
     function initialize(
-        TevaTokenV1 _token,
+        TevaTokenV2 _token,
         bytes32 _merkleRoot,
         uint256 _maximumTotalClaimable,
         uint256 _windowStart,

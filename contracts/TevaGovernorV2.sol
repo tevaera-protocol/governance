@@ -15,7 +15,7 @@ import "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol
  * @dev A custom governance contract using OpenZeppelin's GovernorUpgradeable and extensions.
  * This contract allows voting, quorum management, and timelock-based execution of proposals.
  */
-contract TevaGovernorV2 is
+contract TevaGovernorV1 is
     Initializable,
     GovernorUpgradeable,
     GovernorSettingsUpgradeable,
@@ -53,21 +53,6 @@ contract TevaGovernorV2 is
         __GovernorTimelockControl_init(_timelock);
         __GovernorCountingSimple_init();
         __ReentrancyGuard_init();
-    }
-
-    function initializeV2(
-        uint48 _votingDelay,
-        uint32 _votingPeriod,
-        uint256 _proposalThreshold,
-        uint256 _quorumPercentage
-    ) external reinitializer(2) {
-        __GovernorSettings_init(
-            _votingDelay,
-            _votingPeriod,
-            _proposalThreshold
-        );
-
-        __GovernorVotesQuorumFraction_init(_quorumPercentage);
     }
 
     /**
@@ -183,8 +168,9 @@ contract TevaGovernorV2 is
     )
         internal
         override(GovernorUpgradeable, GovernorCountingSimpleUpgradeable)
+        returns (uint256)
     {
-        super._countVote(proposalId, account, support, weight, params);
+        return super._countVote(proposalId, account, support, weight, params);
     }
 
     /**

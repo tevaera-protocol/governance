@@ -27,16 +27,16 @@ Ex: python3 slither.py contracts/MultiVestingWalletCliffV1.sol reports/multivest
 To compile all the contracts, run in terminal: -
 > npx hardhat compile
 
-### Deploy contracts on zkSync
+### Deploy contracts on Base
 
 To deploy the separate contracts, run in terminal: -
-> yarn hardhat deploy-zksync --script <scriptName> --network <network_name>
+> npx hardhat run deploy/<scriptPath> --network <network_name>
 
-Ex: yarn hardhat deploy-zksync --script zksync/citizenidv1_deploy.ts --network zksyncSepolia
+Ex: npx hardhat run deploy/base/multivestingwalletv1.ts --network base-sepolia
 ### Run Interaction Scripts Cases on zkSync
-> yarn hardhat run filePath
+> npx hardhat run filePath --network <network_name>
 
-Ex: yarn hardhat run ./scripts/tgeTevaConfiguration.ts   
+Ex: yarn hardhat run ./scripts/tgeTevaConfiguration.ts  --network <network_name>
 ### Run Test Cases on zkSync
 Local Set up 
 > foundryup-zksync --branch main

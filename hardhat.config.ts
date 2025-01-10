@@ -1,94 +1,52 @@
-import "@matterlabs/hardhat-zksync-deploy";
-import "@matterlabs/hardhat-zksync-solc";
-import "@matterlabs/hardhat-zksync-verify";
-import "@matterlabs/hardhat-zksync-upgradable";
-import "@nomicfoundation/hardhat-toolbox";
+import { HardhatUserConfig } from 'hardhat/config';
+import '@nomicfoundation/hardhat-toolbox';
 
-const config = {
+require('dotenv').config();
+
+const config: HardhatUserConfig = {
   solidity: {
-    version: "0.8.26",
+    version: '0.8.26',
     settings: {
       optimizer: {
         enabled: true,
         runs: 200,
       },
-      viaIR: true,
+      viaIR: true, // Enable the intermediate representation compiler
     },
   },
-  zksolc: {
-    version: "1.5.4",
-    compilerSource: "binary",
-    settings: {},
-  },
-  defaultNetwork: "zkSyncSepolia",
-
+  sourcify: {
+    enabled: true
+  },  
   networks: {
-    zkSyncGoerli: {
-      url: "https://testnet.era.zksync.dev",
-      ethNetwork: "goerli",
-      zksync: true,
-      verifyURL:
-        "https://zksync2-testnet-explorer.zksync.dev/contract_verification",
+    // for mainnet
+    'base-mainnet': {
+      url: 'https://mainnet.base.org'
     },
-    zkSyncSepolia: {
-      url: "https://sepolia.era.zksync.dev",
-      ethNetwork: "sepolia",
-      zksync: true,
-      verifyURL:
-        "https://explorer.sepolia.era.zksync.dev/contract_verification",
+    // for testnet
+    'base-sepolia': {
+      url: 'https://sepolia.base.org'
     },
-    zkSyncMainnet: {
-      url: "https://mainnet.era.zksync.io",
-      ethNetwork: "mainnet",
-      zksync: true,
-      verifyURL:
-        "https://zksync2-mainnet-explorer.zksync.io/contract_verification",
-    },
-    arbitrumGoerli: {
-      url: "https://goerli-rollup.arbitrum.io/rpc",
-      zksync: false,
-    },
-    arbitrumSepolia: {
-      url: "https://sepolia-rollup.arbitrum.io/rpc",
-      zksync: false,
-    },
-    arbitrumOne: {
-      url: "https://arb1.arbitrum.io/rpc",
-      zksync: false,
-    },
-    lineaGoerli: {
-      url: "https://rpc.goerli.linea.build",
-      zksync: false,
-    },
-    baseGoerli: {
-      url: "https://goerli.base.org",
-      zksync: false,
-    },
-    baseSepolia: {
-      url: "https://sepolia.base.org",
-      zksync: false,
-    },
-    scrollSepolia: {
-      url: "https://sepolia-rpc.scroll.io",
-      zksync: false,
+    // for local dev environment
+    'base-local': {
+      url: 'http://localhost:8545'
     },
   },
   etherscan: {
     apiKey: {
-      arbitrumGoerli: "KY7VQ8AYNP5C29DJUYGDIPBFC5VD13JS3D",
-      linea_testnet: "GX5C89P3SWF2CK9EXQBAD2KW9WGBRQNX53",
+     "base-sepolia": process.env.BASE_SCAN_VERIFICATION_KEY as string
     },
     customChains: [
       {
-        network: "linea_testnet",
-        chainId: 59140,
+        network: "base-sepolia",
+        chainId: 84532,
         urls: {
-          apiURL: "https://api-testnet.lineascan.build/api",
-          browserURL: "https://goerli.lineascan.build/address",
-        },
-      },
-    ],
+         apiURL: "https://api-sepolia.basescan.org/api",
+         browserURL: "https://sepolia.basescan.org"
+        }
+      }
+    ]
   },
+  defaultNetwork: 'hardhat',
 };
 
 export default config;
