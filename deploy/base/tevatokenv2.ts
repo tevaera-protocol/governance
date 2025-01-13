@@ -118,8 +118,12 @@ async function main(hre: HardhatRuntimeEnvironment) {
     contractAdminWallet
   );
   const oAppOwner = await contractAdminWallet.getAddress();
-  const initializeTevaTokenTx = await nyContract.initialize(oAppOwner);
+  const initializeTevaTokenTx = await nyContract.initialize();
   await initializeTevaTokenTx.wait();
+  const initializeV2TevaTokenTx = await nyContract.initializeV2(oAppOwner);
+  await initializeV2TevaTokenTx.wait();
+
+
   console.log("TevaToken initialization response: ", initializeTevaTokenTx);
 }
 

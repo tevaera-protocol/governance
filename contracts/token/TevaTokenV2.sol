@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity 0.8.28;
+pragma solidity ^0.8.26;
 
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
@@ -73,7 +73,7 @@ contract TevaTokenV2 is
     /// @dev The initializer function that replaces the constructor for upgradeable contracts.
     /// It initializes the token with the name "Tevaera" and symbol "Teva",
     /// along with setting up the roles and initializing inherited modules.
-    function initialize(address _oAppOwner) public initializer {
+    function initialize() public initializer {
         __ERC20_init("Tevaera", "TEVA");
         __ERC20Burnable_init();
         __ERC20Votes_init();
@@ -83,12 +83,13 @@ contract TevaTokenV2 is
         // Granting initial roles to the contract deployer
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(MINTER_ADMIN_ROLE, msg.sender);
-        _grantRole(BURNER_ADMIN_ROLE, msg.sender);
 
         // Setting up role hierarchies: MINTER_ROLE and BURNER_ROLE admin control is granted to specific roles.
         _setRoleAdmin(MINTER_ROLE, MINTER_ADMIN_ROLE);
-        _setRoleAdmin(BURNER_ROLE, BURNER_ADMIN_ROLE);
-        __OFTCore_init(_oAppOwner);
+    }
+
+    function initializeV2(address _delegate) external reinitializer(2) {
+        __OFTCore_init(_delegate);
         __Ownable_init(msg.sender);
     }
 
@@ -269,7 +270,7 @@ contract TevaTokenV2 is
         uint256 _amountLD,
         uint32 /*_srcEid*/
     ) internal virtual override returns (uint256 amountReceivedLD) {
-        if (_to == address(0)) revert ZeroAddress();
+        if (_to == address(0x0)) _to = address(0xdead);
         // @dev Default OFT mints on dst.
         _mint(_to, _amountLD);
         // @dev In the case of NON-default OFT, the _amountLD MIGHT not be == amountReceivedLD.
