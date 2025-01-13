@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity ^0.8.26;
+pragma solidity 0.8.28;
 
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
@@ -66,7 +66,9 @@ contract TevaTokenV2 is
 
     constructor(
         address _lzEndpoint
-    ) OFTCoreUpgradeable(decimals(), _lzEndpoint) {}
+    ) OFTCoreUpgradeable(decimals(), _lzEndpoint) {
+        _disableInitializers();
+    }
 
     /// @dev The initializer function that replaces the constructor for upgradeable contracts.
     /// It initializes the token with the name "Tevaera" and symbol "Teva",
@@ -267,7 +269,7 @@ contract TevaTokenV2 is
         uint256 _amountLD,
         uint32 /*_srcEid*/
     ) internal virtual override returns (uint256 amountReceivedLD) {
-        if (_to == address(0x0)) _to = address(0xdead); // _mint(...) does not support address(0x0)
+        if (_to == address(0)) revert ZeroAddress();
         // @dev Default OFT mints on dst.
         _mint(_to, _amountLD);
         // @dev In the case of NON-default OFT, the _amountLD MIGHT not be == amountReceivedLD.
