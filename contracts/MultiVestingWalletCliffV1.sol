@@ -49,6 +49,9 @@ contract MultiVestingWalletCliffV1 is
     /// @dev Zero Address
     error ZeroAddress();
 
+    constructor() {
+        _disableInitializers();
+    }
     function initialize(address _tevaToken) external initializer {
         __Ownable_init(msg.sender);
         __ReentrancyGuard_init();
@@ -148,8 +151,8 @@ contract MultiVestingWalletCliffV1 is
         );
 
         VestingWalletCliffUpgradeable newBeneficiaryVestingWallet = vestingWallets[
-            _newBeneficiary
-        ];
+                _newBeneficiary
+            ];
 
         //Ensure that new beneficiary has no associated vesting wallet.
         require(
@@ -160,7 +163,7 @@ contract MultiVestingWalletCliffV1 is
         vestingWallet.changeOwner(_newBeneficiary);
 
         vestingWallets[_newBeneficiary] = vestingWallet;
-        
+
         delete vestingWallets[_oldBeneficiary];
 
         emit ChangeBeneficiaryAddress(

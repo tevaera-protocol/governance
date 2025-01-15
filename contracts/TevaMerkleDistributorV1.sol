@@ -95,6 +95,9 @@ contract TevaMerkleDistributorV1 is
     /// @notice Thrown if the caller submits an expired signature
     error MerkleDistributor__ExpiredSignature();
 
+    constructor() {
+        _disableInitializers();
+    }
     /// @notice initialize is initializer for a new MerkleDistributor contract
     /// @param _token The contract of the token distributed by the Merkle Distributor.
     /// @param _merkleRoot The Merkle root for the distribution.

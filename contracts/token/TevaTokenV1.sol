@@ -60,6 +60,10 @@ contract TevaTokenV1 is
     /// @dev Zero Address
     error ZeroAddress();
 
+    constructor() {
+        _disableInitializers();
+    }
+
     /// @dev The initializer function that replaces the constructor for upgradeable contracts.
     /// It initializes the token with the name "Tevaera" and symbol "Teva",
     /// along with setting up the roles and initializing inherited modules.

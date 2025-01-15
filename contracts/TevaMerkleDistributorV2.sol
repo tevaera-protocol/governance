@@ -95,6 +95,9 @@ contract TevaMerkleDistributorV2 is
     /// @notice Thrown if the caller submits an expired signature
     error MerkleDistributor__ExpiredSignature();
 
+    constructor() {
+        _disableInitializers();
+    }
     /// @notice initialize is initializer for a new MerkleDistributor contract
     /// @param _token The contract of the token distributed by the Merkle Distributor.
     /// @param _merkleRoot The Merkle root for the distribution.
@@ -112,18 +115,6 @@ contract TevaMerkleDistributorV2 is
         __Nonces_init();
         __Ownable_init(msg.sender);
         TOKEN = _token;
-        MERKLE_ROOT = _merkleRoot;
-        MAXIMUM_TOTAL_CLAIMABLE = _maximumTotalClaimable;
-        WINDOW_START = _windowStart;
-        WINDOW_END = _windowEnd;
-    }
-
-    function initializeV2(
-        bytes32 _merkleRoot,
-        uint256 _maximumTotalClaimable,
-        uint256 _windowStart,
-        uint256 _windowEnd
-    ) external reinitializer(2) {
         MERKLE_ROOT = _merkleRoot;
         MAXIMUM_TOTAL_CLAIMABLE = _maximumTotalClaimable;
         WINDOW_START = _windowStart;

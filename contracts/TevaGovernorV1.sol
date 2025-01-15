@@ -28,7 +28,6 @@ contract TevaGovernorV1 is
     constructor() {
         _disableInitializers();
     }
-
     /**
      * @dev Initializes the Governor contract with settings for voting, quorum, and timelock control.
      * @param _token The ERC20Votes token that is used for governance voting.
@@ -172,8 +171,9 @@ contract TevaGovernorV1 is
     )
         internal
         override(GovernorUpgradeable, GovernorCountingSimpleUpgradeable)
+        returns (uint256)
     {
-        super._countVote(proposalId, account, support, weight, params);
+        return super._countVote(proposalId, account, support, weight, params);
     }
 
     /**
