@@ -66,7 +66,9 @@ contract TevaTokenV2 is
 
     constructor(
         address _lzEndpoint
-    ) OFTCoreUpgradeable(decimals(), _lzEndpoint) {}
+    ) OFTCoreUpgradeable(decimals(), _lzEndpoint) {
+        _disableInitializers();
+    }
 
     /// @dev The initializer function that replaces the constructor for upgradeable contracts.
     /// It initializes the token with the name "Tevaera" and symbol "Teva",
@@ -81,11 +83,9 @@ contract TevaTokenV2 is
         // Granting initial roles to the contract deployer
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(MINTER_ADMIN_ROLE, msg.sender);
-        _grantRole(BURNER_ADMIN_ROLE, msg.sender);
 
         // Setting up role hierarchies: MINTER_ROLE and BURNER_ROLE admin control is granted to specific roles.
         _setRoleAdmin(MINTER_ROLE, MINTER_ADMIN_ROLE);
-        _setRoleAdmin(BURNER_ROLE, BURNER_ADMIN_ROLE);
     }
 
     function initializeV2(address _delegate) external reinitializer(2) {
@@ -270,7 +270,7 @@ contract TevaTokenV2 is
         uint256 _amountLD,
         uint32 /*_srcEid*/
     ) internal virtual override returns (uint256 amountReceivedLD) {
-        if (_to == address(0x0)) _to = address(0xdead); // _mint(...) does not support address(0x0)
+        if (_to == address(0x0)) _to = address(0xdead);
         // @dev Default OFT mints on dst.
         _mint(_to, _amountLD);
         // @dev In the case of NON-default OFT, the _amountLD MIGHT not be == amountReceivedLD.
