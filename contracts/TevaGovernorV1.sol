@@ -25,6 +25,9 @@ contract TevaGovernorV1 is
     GovernorTimelockControlUpgradeable,
     ReentrancyGuardUpgradeable
 {
+    constructor() {
+        _disableInitializers();
+    }
     /**
      * @dev Initializes the Governor contract with settings for voting, quorum, and timelock control.
      * @param _token The ERC20Votes token that is used for governance voting.

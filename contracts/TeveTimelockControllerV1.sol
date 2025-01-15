@@ -17,6 +17,9 @@ contract TeveTimelockControllerV1 is
     TimelockControllerUpgradeable,
     ReentrancyGuardUpgradeable
 {
+    constructor() {
+        _disableInitializers();
+    }
     /**
      * @dev Initializes the contract with a minimum delay,
      * proposers, and executors.
