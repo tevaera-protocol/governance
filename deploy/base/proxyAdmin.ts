@@ -13,42 +13,6 @@ async function main(hre: HardhatRuntimeEnvironment) {
      if (!base_rpc_provider_uri) throw new Error("Please set Base provider url");
      const provider = new ethers.JsonRpcProvider(base_rpc_provider_uri);
  
-     const layerzeroBaseEndpoint = process.env.LAYERZERO_BASE_ENDPOINT_V2;
-     if (!layerzeroBaseEndpoint)
-         throw new Error("Please set base layer zero endpoint");
-     const teveTimelockDelay = process.env.TEVA_TIMELOCK_EXECUTION_DELAY;
-     if (!teveTimelockDelay) throw new Error("Please set TEVA_TIMELOCK_EXECUTION_DELAY address");
-     const minDelay = BigInt(teveTimelockDelay);
- 
-     let proposalAddressArray = process.env.PROPOSERS_ADDRESS_ARRAY;
-     if (!proposalAddressArray) throw new Error("Please set PROPOSERS_ADDRESS_ARRAY ");
-     proposalAddressArray = JSON.parse(proposalAddressArray);
- 
-     let executorAddressArray = process.env.EXECUTORS_ADDRESS_ARRAY;
-     if (!executorAddressArray) throw new Error("Pleae set EXECUTORS_ADDRESS_ARRAY");
-     executorAddressArray = JSON.parse(executorAddressArray);
- 
-     const tevaVotingDelay = process.env.TEVA_VOTING_DELAY; // Number of blocks in between
-     if (!tevaVotingDelay) throw new Error("Please set TEVA_VOTING_DELAY");
-     const tevaVotingPeriod = process.env.TEVA_VOTING_PERIOD; // Numbers of blocks in between when voting remains valid
-     if (!tevaVotingPeriod) throw new Error("Please set TEVA_VOTING_PERIOD");
-     let tevaProposalThresholdValue = process.env.TEVA_PROPOSAL_THRESHOLD;
-     if (!tevaProposalThresholdValue)
-         throw new Error("Please set TEVA_PROPOSAL_THRESHOLD");
-     const tevaProposalThreshold = ethers.parseUnits(tevaProposalThresholdValue, 18); // Token value :1000
-     const tevaQuorumPercentage = process.env.TEVA_QUORUM_PERCENTAGE; // quorum percentage
-     if (!tevaQuorumPercentage)
-         throw new Error("Please set TEVA_QUORUM_PERCENTAGE");
- 
-     const merkelRoot = process.env.INVESTOR_MERKEL_ROOT;
-     if (!merkelRoot) throw new Error("Please set merkel root");
-     const maxClaimableAmount = process.env.INVESTOR_MAX_CLAIMABLE_LIMIT;
-     if (!maxClaimableAmount) throw new Error("Pleae ste max claimable limit");
-     const claimStart = process.env.CLAIM_START_TIME;
-     if (!claimStart) throw new Error("Please set claim starting time");
-     const claimEnd = process.env.CLAIM_END_TIME;
-     if (!claimEnd) throw new Error("Please set claim end time");
- 
      // Initialize the safeWallet.
      const proxyAdminWallet = new ethers.Wallet(
          `${process.env.PROXY_ADMIN_WALLET_PK}`,
