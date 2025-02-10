@@ -131,8 +131,8 @@ contract TevaTokenV1 is
             ERC20Upgradeable
         )
     {
-        // Call the parent contract's _update method to ensure votes and supply are correctly updated.
-        super._update(from, to, value);
+        // Disable transfers
+        revert("All transfers are disabled permanently");
     }
 
     /// @dev Overrides the `nonces` function to resolve potential conflicts between
