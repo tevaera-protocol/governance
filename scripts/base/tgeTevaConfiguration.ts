@@ -23,25 +23,6 @@ async function run() {
   if (!tevaIntialTokenMintAmount)
     throw new Error("Please set tevaIntialTokenMintAmount address");
 
-  const multiVestingContractAddress =
-    process.env.MULTI_VESTING_CONTRACT_ADDRESS;
-  if (!multiVestingContractAddress)
-    throw new Error("Please set multiVestingContractAddress address");
-
-  const tevaCommunityMerkleDistributorContractAddress =
-    process.env.TEVA_COMMUNITY_MERKLE_DISTRIBUTOR_CONTRACT_ADDRESS;
-  if (!tevaCommunityMerkleDistributorContractAddress)
-    throw new Error(
-      "Please set tevaCommunityMerkleDistributorContractAddress address"
-    );
-
-  const tevaInvestorMerkleDistributorContractAddress =
-    process.env.TEVA_INVESTOR_MERKLE_DISTRIBUTOR_CONTRACT_ADDRESS;
-  if (!tevaInvestorMerkleDistributorContractAddress)
-    throw new Error(
-      "Please set tevaInvestorMerkleDistributorContractAddress address"
-    );
-
   const dexContractAddress = process.env.DEX_CONTRACT_ADDRESS;
   if (!dexContractAddress)
     throw new Error("Please set dexContractAddress address");
@@ -65,35 +46,11 @@ async function run() {
     contractAdminWallet
   );
 
-  const addMinterRoleToMultiVestingTx = await tevaContract.grantRole(
-    tevaContract.MINTER_ROLE(),
-    multiVestingContractAddress
-  );
-  await addMinterRoleToMultiVestingTx.wait();
-
-  const addMinterRoleToTevaCommunityMerkleTx = await tevaContract.grantRole(
-    tevaContract.MINTER_ROLE(),
-    tevaCommunityMerkleDistributorContractAddress
-  );
-  await addMinterRoleToTevaCommunityMerkleTx.wait();
-
-  const addMinterRoleToTevaInvestorMerkleTx = await tevaContract.grantRole(
-    tevaContract.MINTER_ROLE(),
-    tevaInvestorMerkleDistributorContractAddress
-  );
-  await addMinterRoleToTevaInvestorMerkleTx.wait();
-
   const addMinterRoleToAdminWalletTx = await tevaContract.grantRole(
     tevaContract.MINTER_ROLE(),
     contractAdminWallet.getAddress()
   );
   await addMinterRoleToAdminWalletTx.wait();
-
-  const mintTevaTx = await tevaContract.mint(
-    contractAdminWallet.getAddress(),
-    ethers.parseEther(tevaIntialTokenMintAmount)
-  );
-  await mintTevaTx.wait();
 
   const approveTevaToDexTx = await tevaContract.approve(
     dexContractAddress,
