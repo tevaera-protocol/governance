@@ -10,14 +10,16 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20CappedUp
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
 import "@openzeppelin/contracts/utils/math/SafeCast.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20PausableUpgradeable.sol";
 
-contract TevaTokenV1 is
+contract TevaTokenV3 is
     Initializable,
     ERC20BurnableUpgradeable,
     AccessControlUpgradeable,
     ERC20PermitUpgradeable,
     ERC20VotesUpgradeable,
-    ERC20CappedUpgradeable
+    ERC20CappedUpgradeable,
+    ERC20PausableUpgradeable
 {
     using SignatureChecker for address;
 
@@ -132,9 +134,12 @@ contract TevaTokenV1 is
         override(
             ERC20CappedUpgradeable,
             ERC20VotesUpgradeable,
-            ERC20Upgradeable
+            ERC20Upgradeable,
+            ERC20PausableUpgradeable
         )
     {
+        require(!paused(), "Transfers are paused");
+
         // Call the parent contract's _update method to ensure votes and supply are correctly updated.
         super._update(from, to, value);
     }
@@ -192,5 +197,20 @@ contract TevaTokenV1 is
 
         // Delegate the voting power to the specified delegatee.
         _delegate(_signer, _delegatee);
+    }
+
+    bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
+
+    function initializeV3() external reinitializer(3) {
+        __Pausable_init();
+        _grantRole(PAUSER_ROLE, msg.sender);
+    }
+
+    function pause() external onlyRole(PAUSER_ROLE) {
+        _pause();
+    }
+
+    function unpause() external onlyRole(PAUSER_ROLE) {
+        _unpause();
     }
 }

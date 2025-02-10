@@ -9,7 +9,7 @@ dotenv.config();
 // An example of a deploy script that will deploy and call a simple contract.
 export default async function (hre: HardhatRuntimeEnvironment) {
   console.log(
-    `Running deploy script for the upgradable TevaToken V2 contract with transparent proxy...`
+    `Running deploy script for the upgradable TevaToken V3 contract with transparent proxy...`
   );
 
   // environment variables
@@ -45,25 +45,24 @@ export default async function (hre: HardhatRuntimeEnvironment) {
   const contractDeployer = new Deployer(hre, contractAdminWallet);
 
   // Deploy the simplifier kraken contract
-  const tevaGovernorArtifact = await contractDeployer.loadArtifact(
-    "contracts/TevaTokenV1.sol:TevaTokenV1"
+  const tevaTokenArtifact = await contractDeployer.loadArtifact(
+    "contracts/TevaTokenV3.sol:TevaTokenV3"
   );
-  const tevaGovernorConstArgs = [];
-  const tevaGovernorContract = await contractDeployer.deploy(
-    tevaGovernorArtifact,
-    tevaGovernorConstArgs
-  );
-  console.log(
-    "args: " +
-      tevaGovernorContract.interface.encodeDeploy(tevaGovernorConstArgs)
+  const tevaTokenConstArgs = [];
+  const tevaTokenContract = await contractDeployer.deploy(
+    tevaTokenArtifact,
+    tevaTokenConstArgs
   );
   console.log(
-    `TevaToken was deployed to ${await tevaGovernorContract.getAddress()}`
+    "args: " + tevaTokenContract.interface.encodeDeploy(tevaTokenConstArgs)
+  );
+  console.log(
+    `TevaToken was deployed to ${await tevaTokenContract.getAddress()}`
   );
 
   const verifyTevaToken = await hre.run("verify:verify", {
-    address: await tevaGovernorContract.getAddress(),
-    constructorArguments: tevaGovernorConstArgs,
+    address: await tevaTokenContract.getAddress(),
+    constructorArguments: tevaTokenConstArgs,
   });
 
   console.log("Verification res: ", verifyTevaToken);
@@ -80,8 +79,22 @@ export default async function (hre: HardhatRuntimeEnvironment) {
 
   const upgradeImplementation = await paContract.upgrade(
     tevaTokenContractAddress,
-    await tevaGovernorContract.getAddress()
+    await tevaTokenContract.getAddress()
   );
   await upgradeImplementation.wait();
   console.log("Proxy upgrade response: ", upgradeImplementation);
+
+  const nyContract = new Contract(
+    tevaTokenContractAddress,
+    tevaTokenArtifact.abi,
+    contractAdminWallet._signerL2()
+  );
+
+  const initialize = await nyContract.initializeV3();
+  await initialize.wait();
+  console.log("Initialized successfully");
+
+  const pause = await nyContract.initializeV3();
+  await pause.wait();
+  console.log("Paused successfully");
 }
