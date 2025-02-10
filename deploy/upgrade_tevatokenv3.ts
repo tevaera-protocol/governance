@@ -46,7 +46,7 @@ export default async function (hre: HardhatRuntimeEnvironment) {
 
   // Deploy the simplifier kraken contract
   const tevaTokenArtifact = await contractDeployer.loadArtifact(
-    "contracts/TevaTokenV3.sol:TevaTokenV3"
+    "contracts/token/TevaTokenV3.sol:TevaTokenV3"
   );
   const tevaTokenConstArgs = [];
   const tevaTokenContract = await contractDeployer.deploy(
