@@ -14,7 +14,7 @@ contract MultiVestingWalletCliffV1 is
 
     /// @dev Mapping to track vesting wallets for each beneficiary.
     /// Each beneficiary address maps to their respective `VestingWalletCliffUpgradeable` contract.
-    mapping(address => VestingWalletCliffUpgradeable) public vestingWallets;
+    mapping(address => VestingWalletCliffUpgradeable) private vestingWallets;
 
     /// @dev Event emitted when a new vesting wallet is created for a beneficiary.
     /// @param beneficiary The address of the beneficiary for whom the vesting wallet is created.
@@ -52,6 +52,7 @@ contract MultiVestingWalletCliffV1 is
     constructor() {
         _disableInitializers();
     }
+
     function initialize(address _tevaToken) external initializer {
         __Ownable_init(msg.sender);
         __ReentrancyGuard_init();
@@ -95,14 +96,12 @@ contract MultiVestingWalletCliffV1 is
         vestingWallet.initialize(
             beneficiary,
             address(this),
+            amount,
             start,
             duration,
             cliff
         );
         vestingWallets[beneficiary] = vestingWallet;
-
-        // Mint tokens to the vesting wallet, locking them for the vesting schedule.
-        tevaToken.mint(address(vestingWallet), amount);
 
         // Emit an event signaling the creation of the new vesting wallet.
         emit VestingWalletCreated(
@@ -127,6 +126,10 @@ contract MultiVestingWalletCliffV1 is
 
         //Calculate the amount of vested tokens that can be released and release them.
         uint256 amount = vestingWallet.releasable(address(tevaToken));
+
+        // Mint tokens to the vesting wallet, locking them for the vesting schedule.
+        tevaToken.mint(address(vestingWallet), amount);
+
         vestingWallet.release(address(tevaToken));
 
         emit ReleasedVestedTokens(msg.sender, address(vestingWallet), amount);

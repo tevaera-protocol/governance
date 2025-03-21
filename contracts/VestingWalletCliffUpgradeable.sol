@@ -9,7 +9,9 @@ import "@openzeppelin/contracts-upgradeable/finance/VestingWalletUpgradeable.sol
  * where no tokens are vested until the cliff period has passed.
  */
 contract VestingWalletCliffUpgradeable is VestingWalletUpgradeable {
-    address public multiVestingWalletAddress;
+    address private multiVestingWalletAddress;
+    uint256 private amount;
+
     /// @custom:storage-location erc7201:openzeppelin.storage.VestingWalletCliff
     /// @dev This structure stores the cliff timestamp in a custom storage location to extend the base storage of VestingWalletUpgradeable.
     struct VestingWalletCliffStorage {
@@ -41,31 +43,37 @@ contract VestingWalletCliffUpgradeable is VestingWalletUpgradeable {
      * @dev Initializes the vesting wallet with cliff functionality.
      * Calls the base `__VestingWallet_init` function to set the beneficiary, vesting start,
      * and linear vesting duration, and sets the cliff period's end time.
-     * @param beneficiaryAddress The address of the wallet that will receive the vested tokens.
-     * @param vestingStartTime The start time of the vesting schedule (in UNIX timestamp).
-     * @param linearVestingDurationSeconds The total duration for the vesting to complete.
-     * @param cliffEndTime The UNIX timestamp marking the end of the cliff period.
+     * @param _beneficiaryAddress The address of the wallet that will receive the vested tokens.
+     * @param _amount The total amount to be vested.
+     * @param _vestingStartTime The start time of the vesting schedule (in UNIX timestamp).
+     * @param _linearVestingDurationSeconds The total duration for the vesting to complete.
+     * @param _cliffEndTime The UNIX timestamp marking the end of the cliff period.
      */
     function initialize(
-        address beneficiaryAddress,
+        address _beneficiaryAddress,
         address _multiVestingWalletAddress,
-        uint64 vestingStartTime,
-        uint64 linearVestingDurationSeconds,
-        uint64 cliffEndTime
+        uint256 _amount,
+        uint64 _vestingStartTime,
+        uint64 _linearVestingDurationSeconds,
+        uint64 _cliffEndTime
     ) external initializer {
         //Access the storage for cliff timestamp and initialize the vesting wallet.
         VestingWalletCliffStorage storage $ = _getVestingWalletCliffStorage();
         __VestingWallet_init(
-            beneficiaryAddress,
-            vestingStartTime,
-            linearVestingDurationSeconds
+            _beneficiaryAddress,
+            _vestingStartTime,
+            _linearVestingDurationSeconds
         );
-        $._cliff = cliffEndTime;
-        multiVestingWalletAddress =_multiVestingWalletAddress;
+        $._cliff = _cliffEndTime;
+        multiVestingWalletAddress = _multiVestingWalletAddress;
+        amount = _amount;
     }
 
-     function changeOwner(address _newOwner) external {
-        require(msg.sender == multiVestingWalletAddress, "caller must be multiVestingWallet" );
+    function changeOwner(address _newOwner) external {
+        require(
+            msg.sender == multiVestingWalletAddress,
+            "caller must be multiVestingWallet"
+        );
         if (_newOwner == address(0)) {
             revert OwnableInvalidOwner(address(0));
         }
@@ -98,5 +106,21 @@ contract VestingWalletCliffUpgradeable is VestingWalletUpgradeable {
             timestamp < cliff()
                 ? 0
                 : super._vestingSchedule(totalAllocation, timestamp);
+    }
+
+    /**
+     * @dev Overriden getter for the amount of releasable eth.
+     */
+    function releasable() public view virtual override returns (uint256) {
+        return this.vestedAmount(uint64(block.timestamp)) - released();
+    }
+
+    /**
+     * @dev Overriden method which calculates the amount of tokens that has already vested. Default implementation is a linear vesting curve.
+     */
+    function vestedAmount(
+        uint64 timestamp
+    ) public view virtual override returns (uint256) {
+        return _vestingSchedule(amount, timestamp);
     }
 }
