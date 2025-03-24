@@ -7,7 +7,7 @@ const MVW_JSON = require("../../artifacts/contracts/MultiVestingWalletCliffV1.so
 const MVW_ABI = MVW_JSON.abi;
 
 // List of vesting schedules
-const VESTING_WALLET_SCHEDULES = [];
+const VESTING_WALLET_SCHEDULES = require("./investor-vesting-wallets.json");
 
 // Note : Before Running the script, please make sure to add total amount of funds to MULTI_VESTING_CLIFF_CONTRACT_ADDRESS
 // so that MULTI_VESTING_CLIFF_CONTRACT_ADDRESS have enough tokens to create the vesting.
@@ -18,8 +18,10 @@ const createVestingWallets = async () => {
   if (!base_rpc_provider_uri) throw new Error("Please set Base provider url");
   const provider = new ethers.JsonRpcProvider(base_rpc_provider_uri);
 
-  const multiVestingContractAddress = process.env.MULTI_VESTING_WALLET_CONTRACT;
-  if (!multiVestingContractAddress) throw new Error("Please set MULTI_VESTING_WALLET_CONTRACT");
+  const multiVestingContractAddress =
+    process.env.MULTI_VESTING_CONTRACT_ADDRESS;
+  if (!multiVestingContractAddress)
+    throw new Error("Please set MULTI_VESTING_CONTRACT_ADDRESS");
 
   const wallet = new ethers.Wallet(
     `${process.env.CONTRACT_ADMIN_WALLET_PK}`,
