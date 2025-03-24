@@ -196,7 +196,7 @@ contract MultiVestingWalletCliffV1 is
         );
 
         // Return the amount of tokens vested for the beneficiary as of the given timestamp.
-        return vestingWallet.vestedAmount(address(tevaToken), _timestamp);
+        return vestingWallet.vestedAmount(_timestamp);
     }
 
     // Reserve storage space for future upgrades

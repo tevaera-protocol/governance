@@ -109,20 +109,13 @@ contract VestingWalletCliffUpgradeable is VestingWalletUpgradeable {
     }
 
     /**
-     * @dev Overriden getter for the amount of releasable eth.
-     */
-    function releasable() public view virtual override returns (uint256) {
-        return this.vestedAmount(uint64(block.timestamp)) - released();
-    }
-
-    /**
      * @dev Overriden getter for the amount of releasable `token` tokens. `token` should be the address of an
      * {IERC20} contract.
      */
     function releasable(
         address token
     ) public view virtual override returns (uint256) {
-        return vestedAmount(token, uint64(block.timestamp)) - released(token);
+        return vestedAmount(uint64(block.timestamp)) - released(token);
     }
 
     /**
@@ -132,19 +125,5 @@ contract VestingWalletCliffUpgradeable is VestingWalletUpgradeable {
         uint64 timestamp
     ) public view virtual override returns (uint256) {
         return _vestingSchedule(amount, timestamp);
-    }
-
-    /**
-     * @dev Overriden method which calculates the amount of tokens that has already vested. Default implementation is a linear vesting curve.
-     */
-    function vestedAmount(
-        address token,
-        uint64 timestamp
-    ) public view virtual override returns (uint256) {
-        return
-            _vestingSchedule(
-                IERC20(token).balanceOf(address(this)) + released(token),
-                timestamp
-            );
     }
 }
