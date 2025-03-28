@@ -57,18 +57,18 @@ async function main(hre: HardhatRuntimeEnvironment) {
     `MultiVestingWalletCliff was deployed to ${await MultiVestingWalletCliffContract.getAddress()}`
   );
 
-  try {
-    await hre.run("verify:verify", {
-      address: await MultiVestingWalletCliffContract.getAddress(),
-      constructorArguments: MultiVestingWalletCliffConstArgs,
-    });
-  } catch (error: any) {
-    if (error.name === "ContractVerificationInvalidStatusCodeError") {
-      console.warn("Verification warning: Contract already verified or partially verified.");
-    } else {
-      console.error("Unexpected error during verification:", error);
-    }
-  }
+  // try {
+  //   await hre.run("verify:verify", {
+  //     address: await MultiVestingWalletCliffContract.getAddress(),
+  //     constructorArguments: MultiVestingWalletCliffConstArgs,
+  //   });
+  // } catch (error: any) {
+  //   if (error.name === "ContractVerificationInvalidStatusCodeError") {
+  //     console.warn("Verification warning: Contract already verified or partially verified.");
+  //   } else {
+  //     console.error("Unexpected error during verification:", error);
+  //   }
+  // }
 
 
   // Deploy the transparent proxy
@@ -94,18 +94,18 @@ async function main(hre: HardhatRuntimeEnvironment) {
     await transparentProxyContract.getAddress()
   );
 
-  try {
-    await hre.run("verify:verify", {
-      address: await transparentProxyContract.getAddress(),
-      constructorArguments: transparentProxyConstArgs,
-    });
-  } catch (error: any) {
-    if (error.name === "ContractVerificationInvalidStatusCodeError") {
-      console.warn("Verification warning: Contract already verified or partially verified.");
-    } else {
-      console.error("Unexpected error during verification:", error);
-    }
-  }
+  // try {
+  //   await hre.run("verify:verify", {
+  //     address: await transparentProxyContract.getAddress(),
+  //     constructorArguments: transparentProxyConstArgs,
+  //   });
+  // } catch (error: any) {
+  //   if (error.name === "ContractVerificationInvalidStatusCodeError") {
+  //     console.warn("Verification warning: Contract already verified or partially verified.");
+  //   } else {
+  //     console.error("Unexpected error during verification:", error);
+  //   }
+  // }
 
 
   // Initializing MultiVestingWalletCliff contract through proxy
