@@ -25,7 +25,7 @@ contract MultiVestingWalletCliffV1 is
     event VestingWalletCreated(
         address indexed beneficiary,
         address indexed vestingWalletcliff,
-        uint64 start,
+        uint64 indexed start,
         uint64 duration,
         uint64 cliff
     );
@@ -37,13 +37,13 @@ contract MultiVestingWalletCliffV1 is
     event ReleasedVestedTokens(
         address indexed beneficiary,
         address indexed vestingWalletcliff,
-        uint256 amount
+        uint256 indexed amount
     );
 
     event ChangeBeneficiaryAddress(
         address indexed vestingWalletcliff,
         address indexed newBeneficiary,
-        address indexed oldBeneficiary
+        address oldBeneficiary
     );
 
     /// @dev Zero Address
